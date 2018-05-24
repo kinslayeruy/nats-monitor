@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="e1f9a809-d26f-45ea-ad95-4813220b7a0b" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/NATSTest/NATSTest.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/NATSTest/NATSTest.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NATSTest/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/NATSTest/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nats.bat" beforeDir="false" afterPath="$PROJECT_DIR$/nats.bat" afterDir="false" />
+    </list>
+    <ignored path=".idea/.idea.NATSTest/.idea/" />
+    <ignored path="NATSTest/obj/" />
+    <ignored path="NATSTest/bin/Debug/netcoreapp1.1/NATSTest.deps.json" />
+    <ignored path="NATSTest/bin/Debug/netcoreapp2.0/NATSTest.deps.json" />
+    <ignored path="NATSTest/bin/Debug/netcoreapp1.1/NATSTest.dll" />
+    <ignored path="NATSTest/bin/Debug/netcoreapp2.0/NATSTest.dll" />
+    <ignored path="NATSTest/bin/Debug/netcoreapp1.1/NATSTest.pdb" />
+    <ignored path="NATSTest/bin/Debug/netcoreapp2.0/NATSTest.pdb" />
+    <ignored path="NATSTest/bin/Debug/netcoreapp1.1/NATSTest.runtimeconfig.dev.json" />
+    <ignored path="NATSTest/bin/Debug/netcoreapp2.0/NATSTest.runtimeconfig.dev.json" />
+    <ignored path="NATSTest/bin/Debug/netcoreapp1.1/NATSTest.runtimeconfig.json" />
+    <ignored path="NATSTest/bin/Debug/netcoreapp2.0/NATSTest.runtimeconfig.json" />
+    <ignored path=".idea/.idea.NATSTest/riderModule.iml" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="Program.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/NATSTest/Program.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-390">
+              <caret line="1" column="18" selection-start-line="1" selection-start-column="18" selection-end-line="1" selection-end-column="18" />
+              <folding>
+                <marker date="1527189741804" expanded="true" signature="7:119" ph="..." />
+                <marker date="1527189741804" expanded="true" signature="139:1978" ph="{...}" />
+                <marker date="1527189741804" expanded="true" signature="159:1976" ph="{...}" />
+                <marker date="1527189741804" expanded="true" signature="279:1743" ph="{...}" />
+                <marker date="1527189741804" expanded="true" signature="934:1125" ph="{...}" />
+                <marker date="1527189741804" expanded="true" signature="1127:1733" ph="{...}" />
+                <marker date="1527189741804" expanded="true" signature="1170:1719" ph="{...}" />
+                <marker date="1527189741804" expanded="true" signature="1275:1353" ph="{...}" />
+                <marker date="1527189741804" expanded="true" signature="1506:1701" ph="{...}" />
+                <marker date="1527189741804" expanded="false" signature="1799:1970" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="nats.bat" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/nats.bat">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="285">
+              <caret line="19" column="5" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/NATSTest/Program.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/NATSTest/Program.cs" />
+        <option value="$PROJECT_DIR$/nats.bat" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1320" />
+    <option name="height" value="784" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="SolutionExplorer" proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scratches" />
+      <pane id="SolutionExplorer">
+        <subPane>
+          <expand>
+            <path>
+              <item name="" type="13324e5d:SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+              <item name="NATSTest (1 project)" type="977d5f41:SolutionExplorerNodeRider" />
+            </path>
+            <path>
+              <item name="" type="13324e5d:SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+              <item name="NATSTest (1 project)" type="977d5f41:SolutionExplorerNodeRider" />
+              <item name="Solution Items" type="977d5f41:SolutionExplorerNodeRider" />
+            </path>
+            <path>
+              <item name="" type="13324e5d:SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+              <item name="NATSTest (1 project)" type="977d5f41:SolutionExplorerNodeRider" />
+              <item name="NATSTest" type="977d5f41:SolutionExplorerNodeRider" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+        <option name="show-file-system" value="false" />
+        <option name="show-all-items" value="false" />
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="Rider.ProjectViewActivator.IsNotFirstRun" value="true" />
+    <property name="TF_FMT" value="false" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/nats.bat" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="Default" type="DotNetProject" factoryName=".NET Project">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/NATSTest/bin/Debug/netcoreapp2.0/NATSTest.dll" />
+      <option name="PROGRAM_PARAMETERS" value="deluxe.metadata-ingest.payload" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/NATSTest" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <envs>
+        <env name="ASPNETCORE_ENVIRONMENT" value="Development" />
+        <env name="ASPNETCORE_URLS" value="http://localhost:5000" />
+      </envs>
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <option name="USE_MONO" value="0" />
+      <option name="PROJECT_PATH" value="$PROJECT_DIR$/NATSTest/NATSTest.csproj" />
+      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
+      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
+      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
+      <option name="PROJECT_KIND" value="DotNetCore" />
+      <option name="PROJECT_TFM" value=".NETCoreApp,Version=v2.0" />
+      <browser url="http://localhost:5000" />
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e1f9a809-d26f-45ea-ad95-4813220b7a0b" name="Default" comment="" />
+      <created>1523456020110</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1523456020110</updated>
+      <workItem from="1523456023407" duration="408000" />
+      <workItem from="1525378598997" duration="1169000" />
+      <workItem from="1527181762004" duration="5237000" />
+      <workItem from="1527188485809" duration="2660000" />
+    </task>
+    <task id="LOCAL-00001" summary="inital commit">
+      <created>1523456312546</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1523456312546</updated>
+    </task>
+    <task id="LOCAL-00002" summary="inital commit">
+      <created>1523456341082</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1523456341082</updated>
+    </task>
+    <task id="LOCAL-00003" summary="script">
+      <created>1523456392718</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1523456392718</updated>
+    </task>
+    <task id="LOCAL-00004" summary="script">
+      <created>1523456430648</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1523456430648</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="9474000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1320" height="784" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="Errors In Solution" order="3" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info anchor="bottom" id="Unit Tests" order="7" />
+      <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.4876161" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.24593967" />
+      <window_info anchor="bottom" id="Terminal" order="7" />
+      <window_info anchor="bottom" id="NuGet" order="7" weight="0.18421052" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26507938" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Build" order="8" />
+      <window_info anchor="right" id="Database" order="3" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.55727553" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="UnityProjectConfiguration" isUnityUI="false" />
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="inital commit" />
+    <MESSAGE value="script" />
+    <option name="LAST_COMMIT_MESSAGE" value="script" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="5" />
+    </breakpoint-manager>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/NATSTest/Program.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="35" column="53" selection-start-line="35" selection-start-column="53" selection-end-line="35" selection-end-column="53" />
+          <folding>
+            <marker date="1527189741804" expanded="true" signature="7:119" ph="..." />
+            <marker date="1527189741804" expanded="true" signature="139:1978" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="159:1976" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="279:1743" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="934:1125" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1127:1733" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1170:1719" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1275:1353" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1506:1701" ph="{...}" />
+            <marker date="1527189741804" expanded="false" signature="1799:1970" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nats.bat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="118" lean-forward="true" selection-start-line="5" selection-start-column="14" selection-end-line="5" selection-end-column="118" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NATSTest/Program.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="22" lean-forward="true" selection-end-line="36" />
+          <folding>
+            <marker date="1527189741804" expanded="true" signature="7:119" ph="..." />
+            <marker date="1527189741804" expanded="true" signature="139:1978" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="159:1976" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="279:1743" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="934:1125" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1127:1733" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1170:1719" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1275:1353" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1506:1701" ph="{...}" />
+            <marker date="1527189741804" expanded="false" signature="1799:1970" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nats.bat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NATSTest/Program.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
+          <folding>
+            <marker date="1527189741804" expanded="true" signature="7:119" ph="..." />
+            <marker date="1527189741804" expanded="true" signature="139:1978" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="159:1976" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="279:1743" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="934:1125" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1127:1733" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1170:1719" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1275:1353" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1506:1701" ph="{...}" />
+            <marker date="1527189741804" expanded="false" signature="1799:1970" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nats.bat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="26" selection-start-line="3" selection-start-column="26" selection-end-line="3" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NATSTest/Program.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-390">
+          <caret line="1" column="18" selection-start-line="1" selection-start-column="18" selection-end-line="1" selection-end-column="18" />
+          <folding>
+            <marker date="1527189741804" expanded="true" signature="7:119" ph="..." />
+            <marker date="1527189741804" expanded="true" signature="139:1978" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="159:1976" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="279:1743" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="934:1125" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1127:1733" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1170:1719" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1275:1353" ph="{...}" />
+            <marker date="1527189741804" expanded="true" signature="1506:1701" ph="{...}" />
+            <marker date="1527189741804" expanded="false" signature="1799:1970" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nats.bat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="5" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

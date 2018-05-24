@@ -1,30 +1,53 @@
-﻿using System;
+﻿﻿using System;
 using System.Linq;
-using System.Text;
-using NATS.Client;
+ using System.Text;
+using System.Threading;
 using Newtonsoft.Json;
+using STAN.Client;
 
 namespace NATSTest
 {
     class Program
     {
+        private const string URL = "nats://events.service.owf-dev:4222";
+
         static void Main(string[] args)
         {
-            var cf = new ConnectionFactory();
+            var eventName = args != null && args.Any() ? args[0] : "deluxe.*.*";
 
-            var c = cf.CreateConnection("nats://events.service.owf-dev:4222");
+            var scf = new StanConnectionFactory();
+            var options = StanOptions.GetDefaultOptions();
 
-            void EventHandler(object sender, MsgHandlerEventArgs e)
+            options.NatsURL = URL;
+            var stanConnection = scf.CreateConnection("events-streaming", Guid.NewGuid().ToString(), options);
+
+            var subOptions = StanSubscriptionOptions.GetDefaultOptions();
+            subOptions.DurableName = "NatsTest";
+
+            Console.WriteLine($"Starting connection to {eventName} at {URL}");
+            using (var sub = stanConnection.Subscribe(eventName, subOptions, (sender, handlerArgs) =>
             {
-                Console.WriteLine(e.Message.Subject);
-                Console.WriteLine(format_json(Encoding.UTF8.GetString(e.Message.Data)));
-            }
+                Console.WriteLine(handlerArgs.Message.Subject);
+                Console.WriteLine(format_json(Encoding.UTF8.GetString(handlerArgs.Message.Data)));
+            }))
+            {
+                while (true)
+                {
+                    Thread.Sleep(200);
 
-            var eventName = args != null && args.Any() ? args[0] : "deluxe.metadata-ingest.*";
-            
-            var sAsync = c.SubscribeAsync(eventName);
-            sAsync.MessageHandler += EventHandler;
-            sAsync.Start();
+                    if (!Console.KeyAvailable)
+                    {
+                        continue;
+                    }
+                    var key = Console.ReadKey(true);
+                    if (key.Modifiers.HasFlag(ConsoleModifiers.Control) && key.Key == ConsoleKey.S)
+                    {
+                        sub.Close();
+                        Console.WriteLine("Exiting application...");
+                        Environment.Exit(0);
+                    }
+                }
+            }
         }
 
         private static string format_json(string json)
