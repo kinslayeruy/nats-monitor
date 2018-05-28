@@ -14,7 +14,7 @@ IF "%1" == "repo" (
 
 cls
 echo NATS Monitoring... Use Ctrl-C to exit
-dotnet c:\tools\NATS\NATSTest.dll %1
+c:\tools\NATS\NATSMonitor.exe %1
 
 
 :exit

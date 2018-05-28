@@ -1,3 +1,5 @@
-NATSTest\bin
-NATSTest\obj
-.idea\
+NATSMonitor/bin
+NATSMonitor/obj
+.idea/
+packages/
+*.user

@@ -1,19 +1,24 @@
-﻿﻿using System;
+﻿using System;
 using System.Linq;
- using System.Text;
+using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
 using STAN.Client;
 
-namespace NATSTest
+namespace NATSMonitor
 {
-    class Program
+    internal class Program
     {
         private const string URL = "nats://events.service.owf-dev:4222";
-
-        static void Main(string[] args)
+        
+        public static void Main(string[] args)
         {
-            var eventName = args != null && args.Any() ? args[0] : "deluxe.*.*";
+            if (args == null || !args.Any())
+            {
+                Console.WriteLine("Need argument!");
+                Environment.Exit(1);
+            }
+            var eventName = args[0];
 
             var scf = new StanConnectionFactory();
             var options = StanOptions.GetDefaultOptions();
@@ -49,7 +54,7 @@ namespace NATSTest
                 }
             }
         }
-
+        
         private static string format_json(string json)
         {
             dynamic parsedJson = JsonConvert.DeserializeObject(json);
