@@ -10,7 +10,7 @@ namespace NATSMonitor
     internal class Program
     {
         private const string URL = "nats://events.service.owf-dev:4222";
-        
+
         public static void Main(string[] args)
         {
             if (args == null || !args.Any())
@@ -18,16 +18,21 @@ namespace NATSMonitor
                 Console.WriteLine("Need argument!");
                 Environment.Exit(1);
             }
+
             var eventName = args[0];
 
             var scf = new StanConnectionFactory();
             var options = StanOptions.GetDefaultOptions();
 
             options.NatsURL = URL;
-            var stanConnection = scf.CreateConnection("events-streaming", Guid.NewGuid().ToString(), options);
+            var clientId = Environment.MachineName;
+            var stanConnection = scf.CreateConnection("events-streaming",
+                clientId,
+                options);
 
             var subOptions = StanSubscriptionOptions.GetDefaultOptions();
             subOptions.DurableName = "NatsTest";
+            subOptions.DeliverAllAvailable();
 
             Console.WriteLine($"Starting connection to {eventName} at {URL}");
             using (var sub = stanConnection.Subscribe(eventName, subOptions, (sender, handlerArgs) =>
@@ -38,12 +43,13 @@ namespace NATSMonitor
             {
                 while (true)
                 {
-                    Thread.Sleep(200);
+                    Thread.Sleep(1000);
 
                     if (!Console.KeyAvailable)
                     {
                         continue;
                     }
+
                     var key = Console.ReadKey(true);
                     if (key.Modifiers.HasFlag(ConsoleModifiers.Control) && key.Key == ConsoleKey.S)
                     {
@@ -54,7 +60,7 @@ namespace NATSMonitor
                 }
             }
         }
-        
+
         private static string format_json(string json)
         {
             dynamic parsedJson = JsonConvert.DeserializeObject(json);

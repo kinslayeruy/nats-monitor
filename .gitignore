@@ -1,5 +1,7 @@
 NATSMonitor/bin
 NATSMonitor/obj
+TestIngest/bin/**/*.*
+TestIngest/obj/**/*.*
 .idea/
 packages/
 *.user
