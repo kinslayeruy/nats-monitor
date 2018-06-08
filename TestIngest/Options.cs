@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace TestIngest
 {
@@ -7,12 +8,13 @@ namespace TestIngest
         public bool Subdirectories { get; private set; }
         public bool DoNotHidePayload { get; private set; }
         public bool Alphas { get; private set; }
-        public ServiceInfoPool Hosts { get; private set; }
+        public string Host { get; private set; }
+        public int MaxParallel { get; private set; }
 
         public Options(string [] args)
         {
-            Hosts = new ServiceInfoPool(new[]
-                {new ServiceInfo {Hostname = "localhost", IP = "127.0.0.1", Port = 5000}});
+            Host = "http://localhost:5000";
+            MaxParallel = 1;
             ParseArgs(args);
         }
 
@@ -24,7 +26,8 @@ namespace TestIngest
                    "\t-p\t\tDoes not hide the payload from the results.\n\n" +
                    "\t\t\tThis option will make all messages bigger and harder to read\n\n" +
                    "\t-a\t\tSets payloads as alphas instead of GPMS\n\n" +
-                   "\t-h: hostname\tSets the hostname \n(default http://localhost:5000)\n";
+                   "\t-h hostname\tSets the hostname \n(default http://localhost:5000)\n" +
+                   "\t-m maxParallel\tSets the max parallel threads to run (default 1)";
         }
 
         private void ParseArgs(string[] args)
@@ -44,11 +47,22 @@ namespace TestIngest
                 Alphas = true;
             }
 
-            var hostname = args.SkipWhile(a => a != "-h").Skip(1).FirstOrDefault();
-            if (!string.IsNullOrWhiteSpace(hostname))
+            if (args.Contains("-m"))
             {
-                var serviceInfos = new Resolver().Query(hostname);
-                Hosts = serviceInfos;                
+                var max = args.SkipWhile(a => a != "-m").Skip(1).FirstOrDefault();
+                if (!string.IsNullOrWhiteSpace(max) && int.TryParse(max, out var maxPara))
+                {
+                    MaxParallel = maxPara;
+                }
+            }
+
+            if (args.Contains("-h"))
+            {
+                var hostname = args.SkipWhile(a => a != "-h").Skip(1).FirstOrDefault();
+                if (!string.IsNullOrWhiteSpace(hostname))
+                {
+                    Host = $"http://{hostname}";
+                }
             }
         }
     }

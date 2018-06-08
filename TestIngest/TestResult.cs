@@ -1,5 +1,8 @@
-﻿namespace TestIngest
+﻿using System.Diagnostics;
+
+namespace TestIngest
 {
+    [DebuggerDisplay("Success: {Success} FailReason: {FailureReason}")]
     public class TestResult
     {
         public bool Success { get; set; }
