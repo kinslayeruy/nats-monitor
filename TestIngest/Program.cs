@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using TestIngest.Models;
 
 namespace TestIngest
 {
@@ -20,6 +20,8 @@ namespace TestIngest
 
         public static void Main(string[] args)
         {
+            Console.WriteLine(@"Test Ingest Tool - v1.3");
+
             if (args.Any() && args[0] == "-?")
             {
                 Console.WriteLine(Options.Help());
@@ -30,18 +32,20 @@ namespace TestIngest
 
             var atlasResults = new List<TestResult>();
             var mrResults = new List<TestResult>();
+            var linkResults = new List<TestResult>();
 
             const string logFile = "test.log";
-            File.Create(logFile).Close();
-            Console.WriteLine("Starting...");
-            WriteToLog(logFile, "Starting...\n");
+            using (var file = File.Create(logFile))
+            {
+                Debug.WriteLine("file created");
+            }
+            WriteToLog(logFile, "Starting...", true);
 
             var workDir = Environment.CurrentDirectory;
             var allFilesEnum = Directory.EnumerateFiles(workDir, "*.xml",
                 options.Subdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
             var allFiles = allFilesEnum.ToArray();
-            Console.WriteLine($"Found {allFiles.Length} files.");
-            WriteToLog(logFile, $"Found {allFiles.Length} files.\n");
+            WriteToLog(logFile, $"Found {allFiles.Length} files.", true);
 
             var pad = (int) Math.Floor(Math.Log10(allFiles.Length) + 1);
             var watch = new Stopwatch();
@@ -53,14 +57,14 @@ namespace TestIngest
             if (maxParallel > 1 && options.Subdirectories)
             {
                 var currDir = workDir;
-                ProcessDir(currDir,"", paraOptions, allFiles.Length, pad, logFile, atlasResults, mrResults, options, watch);                
+                ProcessDir(currDir,"", paraOptions, allFiles.Length, pad, logFile, atlasResults, mrResults, linkResults, options, watch);                
             }
             else
             {
                 Parallel.ForEach(allFiles, paraOptions,
                     (file, state, index) =>
                     {
-                        ProcessTitle(file, allFiles.Length, index.ToString(), workDir, pad, logFile, atlasResults, mrResults, options, watch);
+                        ProcessTitle(file, allFiles.Length, index.ToString(), workDir, pad, logFile, atlasResults, mrResults, linkResults, options, watch);
                     });
             }
 
@@ -68,28 +72,30 @@ namespace TestIngest
             var successAtlas = atlasResults.Count(r => r.Success);
             var totalMR = mrResults.Count;
             var successMR = mrResults.Count(r => r.Success);
+            var totalLink = linkResults.Count;
+            var successLink = linkResults.Count(r => r.Success);
+            
             Console.WriteLine(
-                $"Finished {(totalAtlas + totalMR):N0} calls, time taken {TimeSpan.FromMilliseconds(watch.ElapsedMilliseconds):g}");
-            Console.WriteLine(
-                $"Atlas: {totalAtlas:N0} calls, {successAtlas:N0} successful, ({((double) successAtlas / totalAtlas):P1})");
-            Console.WriteLine(
-                $"MR   : {totalMR:N0} calls, {successMR:N0} successful, ({((double) successMR / totalMR):P1})");
+                $"Finished {(totalAtlas + totalMR + totalLink):N0} calls, time taken {TimeSpan.FromMilliseconds(watch.ElapsedMilliseconds):g}");
             WriteToLog(logFile,
-                $"Atlas: {totalAtlas:N0} calls, {successAtlas:N0} successful, ({((double) successAtlas / totalAtlas):P1})\n");
+                $"Atlas: {totalAtlas:N0} calls, {successAtlas:N0} successful, ({((double) successAtlas / totalAtlas):P1})", true);
             WriteToLog(logFile,
-                $"MR   : {totalMR:N0} calls, {successMR:N0} successful, ({((double) successMR / totalMR):P1})\n");
+                $"MR   : {totalMR:N0} calls, {successMR:N0} successful, ({((double) successMR / totalMR):P1})", true);
+            WriteToLog(logFile,
+                $"Link : {totalLink:N0} calls, {successLink:N0} successful, ({((double) successLink / totalLink):P1})",
+                true);
             File.Copy(logFile, $"test-{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}.log");
         }
 
         private static void ProcessDir(string currDir, string dirIndex, ParallelOptions paraOptions, long totalFiles, int pad, string logFile,
-            List<TestResult> atlasResults, List<TestResult> mrResults, Options options, Stopwatch watch)
+            List<TestResult> atlasResults, List<TestResult> mrResults, List<TestResult> linkResults, Options options, Stopwatch watch)
         {
             Console.WriteLine("Processing directory " + currDir);
             var dirFiles = Directory.EnumerateFiles(currDir, "*.xml").ToArray();
             for (var index = 0; index < dirFiles.Length; index++)
             {
                 var file = dirFiles[index];
-                ProcessTitle(file, totalFiles, $"{dirIndex}.{index}", currDir, pad, logFile, atlasResults, mrResults, options, watch);
+                ProcessTitle(file, totalFiles, $"{dirIndex}.{index}", currDir, pad, logFile, atlasResults, mrResults, linkResults, options, watch);
             }
 
             
@@ -98,12 +104,12 @@ namespace TestIngest
             Parallel.ForEach(dirFolders, paraOptions,
                 (folder, state, index) =>
                 {
-                    ProcessDir(folder, dirIndex + "/" + index, paraOptions, totalFiles, pad, logFile, atlasResults, mrResults, options, watch);
+                    ProcessDir(folder, dirIndex + "/" + index, paraOptions, totalFiles, pad, logFile, atlasResults, mrResults, linkResults, options, watch);
                 });
         }
 
         private static void ProcessTitle(string file, long totalFiles, string index, string workDir, int pad, string logFile,
-            List<TestResult> atlasResults, List<TestResult> mrResults, Options options, Stopwatch watch)
+            List<TestResult> atlasResults, List<TestResult> mrResults, List<TestResult> linkResults, Options options, Stopwatch watch)
         {
             var startTime = watch.ElapsedMilliseconds;
             var fileForLog = file.Remove(0, workDir.Length);
@@ -117,37 +123,52 @@ namespace TestIngest
                 };
                 Console.WriteLine($"{index} - {testResult.GetAsString()} - File:{fileForLog}");
                 WriteToLog(logFile, $"{index} - Testing {fileForLog}\n" +
-                                            $"{index} - {testResult.GetAsString()}\n");
+                                            $"{index} - {testResult.GetAsString()}", false);
 
                 atlasResults.Add(testResult);
                 mrResults.Add(testResult);
+                linkResults.Add(testResult);
             }
 
             var ingestXML = BuildGPMSPayload(xml, fileForLog, options);
+            var atlas = options.SkipAtlas
+                ? new TestResult {Skipped = true}
+                : CallAtlas(ingestXML, options).GetAwaiter().GetResult();
+            var mr = options.SkipMetadata
+                ? new TestResult {Skipped = true}
+                : CallMetadata(ingestXML, options).GetAwaiter().GetResult();
+            var link = options.SkipLinking
+                ? new[] {new TestResult {Skipped = true}}
+                : CallLink(ingestXML, atlas, mr, options).GetAwaiter().GetResult().ToArray();
+            
 
-            var atlas = CallAtlas(ingestXML, options).GetAwaiter().GetResult();
-            var mr = CallMetadata(ingestXML, options).GetAwaiter().GetResult();
+            var linkStatus = string.Join(", ", link.Select(l => l.GetAsString()));
+
             WriteToLog(logFile,
                 $"{index} - Testing {fileForLog}\n" +
                 $"{index} - AtlasCall - {atlas.GetAsString()}\n" +
-                $"{index} - MRCall    - {mr.GetAsString()}\n");                
+                $"{index} - MRCall    - {mr.GetAsString()}\n" +
+                $"{index} - LinkCalls - {linkStatus}", false);
 
             atlasResults.Add(atlas);
             mrResults.Add(mr);
+            linkResults.AddRange(link);
+
             var time = watch.ElapsedMilliseconds;
             _processed++;
             Console.WriteLine($"{index} " +
-                              $"- {atlas.GetStatus()} - {mr.GetStatus()} " +
+                              $"- {atlas.GetStatus()} - {mr.GetStatus()} - {linkStatus} \n" +
                               $"- Progress {_processed.ToString().PadLeft(pad)}/{totalFiles} ({((double) _processed / totalFiles):P1})- Took {(time - startTime):N0} ms " +
                               $"- Estimated time left: {TimeSpan.FromMilliseconds(((double) (time * totalFiles) / (_processed)) - time).TotalMinutes:N0} minutes aprox");
         }
 
 
-        private static void WriteToLog(string logFile, string text)
+        private static void WriteToLog(string logFile, string text, bool withConsole)
         {
             lock (WriteLock)
             {
-                File.AppendAllText(logFile, text);
+                if (withConsole) Console.WriteLine(text);
+                File.AppendAllText(logFile, text + "\n");
             }
         }
         
@@ -173,28 +194,27 @@ namespace TestIngest
                     {
                         Success = false,
                         FailureReason = $"Call to MR ingest failed {response.StatusCode} - {response.ReasonPhrase}",
-                        Result = content
+                        Result = JsonConvert.DeserializeObject<MetadataIngestEvent>(content)
                     };
                 }
 
-                var json = JsonConvert.DeserializeObject<dynamic>(content);
-                if (json.overallStatus == "Success")
+                var mie = JsonConvert.DeserializeObject<MetadataIngestEvent>(content);
+                if (mie.OverallStatus == PayloadStatus.Success)
                 {
                     return new TestResult
                     {
                         Success = true,
                         FailureReason = null,
-                        Result = content
+                        Result = mie
                     };
                 }
 
                 return new TestResult
                 {
                     Success = false,
-                    FailureReason = ((JArray) json.payloadResults)
-                        .FirstOrDefault(f => !string.IsNullOrWhiteSpace(f.Value<string>("failureReason")))
-                        ?.Value<string>("failureReason"),
-                    Result = content
+                    FailureReason = mie.PayloadResults
+                        .FirstOrDefault(f => !string.IsNullOrWhiteSpace(f.FailureReason))?.FailureReason,
+                    Result = mie
                 };
             }
             catch (Exception ex)
@@ -202,8 +222,7 @@ namespace TestIngest
                 return new TestResult
                 {
                     Success = false,
-                    FailureReason = $"Call to MR ingest failed {ex.Message}",
-                    Result = ex.ToString()
+                    FailureReason = $"Call to MR ingest failed {ex.Message}"                    
                 };
             }
         }
@@ -231,28 +250,27 @@ namespace TestIngest
                     {
                         Success = false,
                         FailureReason = $"Call to Atlas ingest failed {response.StatusCode} - {response.ReasonPhrase}",
-                        Result = content
+                        Result = JsonConvert.DeserializeObject<MetadataIngestEvent>(content)
                     };
                 }
 
-                var json = JsonConvert.DeserializeObject<dynamic>(content);
-                if (json.overallStatus == "Success")
+                var mie = JsonConvert.DeserializeObject<MetadataIngestEvent>(content);
+                if (mie.OverallStatus == PayloadStatus.Success)
                 {
                     return new TestResult
                     {
                         Success = true,
                         FailureReason = null,
-                        Result = content
+                        Result = mie
                     };
                 }
 
                 return new TestResult
                 {
                     Success = false,
-                    FailureReason = ((JArray) json.payloadResults)
-                        .FirstOrDefault(f => !string.IsNullOrWhiteSpace(f.Value<string>("failureReason")))
-                        ?.Value<string>("failureReason"),
-                    Result = content
+                    FailureReason = mie.PayloadResults
+                        .FirstOrDefault(f => !string.IsNullOrWhiteSpace(f.FailureReason))?.FailureReason,
+                    Result = mie
                 };
             }
             catch (Exception ex)
@@ -260,10 +278,71 @@ namespace TestIngest
                 return new TestResult
                 {
                     Success = false,
-                    FailureReason = $"Call to Atlas ingest failed {ex.Message}",
-                    Result = ex.ToString()
+                    FailureReason = $"Call to Atlas ingest failed {ex.Message}"
                 };
             }
+        }
+
+        private static async Task<IEnumerable<TestResult>> CallLink(IngestXML xml, TestResult atlasResult, TestResult mrResult, Options options)
+        {
+            if (!atlasResult.Success)
+            {
+                return new[] {new TestResult
+                {
+                    Success = false,
+                    FailureReason = atlasResult.FailureReason
+                }};
+            }
+
+            var client = new HttpClient { BaseAddress = new Uri(options.Host) };
+            var results = new List<TestResult>();
+            if (mrResult?.Result != null && atlasResult?.Result != null)
+            {
+                foreach (var payloadResult in mrResult.Result.PayloadResults)
+                {
+                    if (payloadResult.Status == PayloadStatus.Failure)
+                    {
+                        results.Add(new TestResult {Success = false, FailureReason = payloadResult.FailureReason});
+                        continue;
+                    }
+
+                    if (payloadResult.Action == PayloadAction.Skipped)
+                    {
+                        results.Add(new TestResult {Success = true});
+                        continue;
+                    }
+
+                    var link = new Link
+                    {
+                        IngestURN = xml.IngestURN,
+                        AtlasIds = atlasResult.Result.PayloadResults.First().AtlasURNs,
+                        MetadataRepositoryId = payloadResult.MetadataRepositoryURN
+                    };
+
+                    var response = await client.PostAsync(
+                        "v1/ingest/link" + (options.DoNotHidePayload ? "" : "?verbosity=HidePayload"),
+                        new StringContent(JsonConvert.SerializeObject(link), Encoding.UTF8,
+                            "application/json"));
+                    if (response.IsSuccessStatusCode)
+                    {
+                        results.Add(new TestResult
+                        {
+                            Success = true
+                        });
+                    }
+                }
+            }
+            else
+            {
+                results.Add(new TestResult
+                {
+                    Success = false,
+                    FailureReason = "No results in Metadata or Atlas Results"                    
+                });
+            }
+
+            return results;
+
         }
 
         private static IngestXML BuildGPMSPayload(string xml, string fileName, Options options)

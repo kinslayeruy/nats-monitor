@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using Newtonsoft.Json;
+using TestIngest.Models;
 
 namespace TestIngest
 {
@@ -7,19 +9,30 @@ namespace TestIngest
     {
         public bool Success { get; set; }
 
-        public string FailureReason { private get; set; }
+        public bool Skipped { get; set; }
 
-        public string Result { private get; set; }
+        public string FailureReason { get; set; }
+
+        public MetadataIngestEvent Result { get; set; }
 
         public string GetAsString()
         {
+            if (Skipped)
+            {
+                return "Skipped";
+            }
+
             return GetStatus() + " " +
                    (!string.IsNullOrWhiteSpace(FailureReason) ? $"FailureReason: {FailureReason} " : "") +
-                   (!string.IsNullOrWhiteSpace(Result) ? $"Result: {Result}" : "");
+                   (Result != null ? $"Result: {JsonConvert.SerializeObject(Result, Formatting.None)}" : "");
         }
 
         public string GetStatus()
         {
+            if (Skipped)
+            {
+                return "Skipped!";
+            }
             return Success ? "Success!" : "Failure!";
         }
     }

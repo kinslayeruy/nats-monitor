@@ -5,3 +5,4 @@ TestIngest/obj/**/*.*
 .idea/
 packages/
 *.user
+/.vs/*

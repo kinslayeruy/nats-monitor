@@ -57,7 +57,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IngestXML.cs" />
+    <Compile Include="Models\AtlasIds.cs" />
+    <Compile Include="Models\AtlasType.cs" />
+    <Compile Include="Models\IngestXML.cs" />
+    <Compile Include="Models\Link.cs" />
+    <Compile Include="Models\MetadataIngestEvent.cs" />
+    <Compile Include="Models\PayloadAction.cs" />
+    <Compile Include="Models\PayloadResult.cs" />
+    <Compile Include="Models\PayloadStatus.cs" />
+    <Compile Include="Models\TransformationDetails.cs" />
+    <Compile Include="Models\TransformationType.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -67,6 +76,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
