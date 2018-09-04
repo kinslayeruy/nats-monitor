@@ -151,14 +151,14 @@ function Compare-RvP
 				$preparserIn = "SonyGPMS"
 				$preparserOut = "Atlas"
 				$Sorts = New-Object -TypeName System.Collections.ArrayList
-				$Sorts.Add(@('feature', 'references', 'value'))
-				$Sorts.Add(@('feature', 'references', 'type'))
-				$Sorts.Add(@('series', 'references', 'value'))
-				$Sorts.Add(@('series', 'references', 'type'))
-				$Sorts.Add(@('episode', 'references', 'value'))
-				$Sorts.Add(@('episode', 'references', 'type'))
-				$Sorts.Add(@('version', 'references', 'value'))
-				$Sorts.Add(@('version', 'references', 'type'))
+				$echo = $Sorts.Add(@('feature', 'references', 'value'))
+				$echo = $Sorts.Add(@('feature', 'references', 'type'))
+				$echo = $Sorts.Add(@('series', 'references', 'value'))
+				$echo = $Sorts.Add(@('series', 'references', 'type'))
+				$echo = $Sorts.Add(@('episode', 'references', 'value'))
+				$echo = $Sorts.Add(@('episode', 'references', 'type'))
+				$echo = $Sorts.Add(@('version', 'references', 'value'))
+				$echo = $Sorts.Add(@('version', 'references', 'type'))
 				break
 			}
 			"SonyAlpha-MR" {
@@ -172,7 +172,7 @@ function Compare-RvP
 				$preparserIn = "SonyAlpha"
 				$preparserOut = "Atlas"
 				$Sorts = New-Object -TypeName System.Collections.ArrayList
-				$Sorts.Add(@('version', 'references', 'type'))
+				$echo = $Sorts.Add(@('version', 'references', 'type'))
 				break
 			}
 		}

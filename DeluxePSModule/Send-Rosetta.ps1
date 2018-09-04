@@ -82,13 +82,16 @@ function Send-Rosetta
 			
 			if (-Not $response.success)
 			{
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite $dashLine
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite ('{0} had errors:' -f $name)
-				foreach ($err in $response.errors)
+				if ($showResults -or $writeError)
 				{
-					Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite ("`t{0}" -f $err)
+					Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite $dashLine
+					Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite ('{0} had errors:' -f $name)
+					foreach ($err in $response.errors)
+					{
+						Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite ("`t{0}" -f $err)
+					}
+					Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite ''
 				}
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite ''
 				$props = @{ }
 				$props.Name = $name
 				$props.Success = $false
@@ -117,7 +120,10 @@ function Send-Rosetta
 				}
 				else
 				{
-					Write-Host "`r" -NoNewline
+					if ($showResults)
+					{
+						Write-Host "`r" -NoNewline
+					}
 					$props = @{ }
 					$props.Name = $name
 					$props.Success = $true
@@ -149,7 +155,7 @@ function Send-Rosetta
 				$reader.DiscardBufferedData()
 				$responseBody = $reader.ReadToEnd()
 			}
-			if (-not $hideProgress)
+			if ($showResults -or $writeError)
 			{
 				Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite $dashLine
 				Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite ('{0} had exception:' -f $name)

@@ -121,16 +121,19 @@ function Send-Preparser
 			
 			if (-Not $response.succeeded)
 			{
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $dashLine
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ('{0} had errors:' -f $name)
-				foreach ($res in $response.results)
+				if ($showResults -or $writeError)
 				{
-					foreach ($err in $res.errors)
+					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $dashLine
+					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ('{0} had errors:' -f $name)
+					foreach ($res in $response.results)
 					{
-						Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ("`t{0}" -f $err)
+						foreach ($err in $res.errors)
+						{
+							Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ("`t{0}" -f $err)
+						}
 					}
+					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ''
 				}
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ''
 				$props = @{ }
 				$props.Name = $name
 				$props.Success = $response.succeeded
@@ -156,7 +159,10 @@ function Send-Preparser
 				}
 				else
 				{
-					Write-Host "`r" -NoNewline
+					if (-not $hideProgress)
+					{
+						Write-Host "`r" -NoNewline
+					}
 					$props = @{ }
 					$props.Name = $name
 					$props.Success = $response.succeeded
@@ -189,15 +195,18 @@ function Send-Preparser
 				$reader.DiscardBufferedData()
 				$responseBody = $reader.ReadToEnd()
 			}
-			Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $dashLine
-			Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ('{0} had exception:' -f $name)
-			Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $exception.Message
-			if ($null -ne $responseBody)
+			if ($showResults -or $writeError)
 			{
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite 'Response Message:'
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $responseBody
+				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $dashLine
+				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ('{0} had exception:' -f $name)
+				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $exception.Message
+				if ($null -ne $responseBody)
+				{
+					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite 'Response Message:'
+					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $responseBody
+				}
+				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ''
 			}
-			Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ''
 			$props = @{ }
 			$props.Name = $name
 			$props.Success = $false
