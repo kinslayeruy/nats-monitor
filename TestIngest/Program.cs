@@ -35,7 +35,7 @@ namespace TestIngest
             var linkResults = new List<TestResult>();
 
             const string logFile = "test.log";
-            using (var file = File.Create(logFile))
+            using (File.Create(logFile))
             {
                 Debug.WriteLine("file created");
             }
@@ -146,9 +146,9 @@ namespace TestIngest
 
             WriteToLog(logFile,
                 $"{index} - Testing {fileForLog}\n" +
-                $"{index} - AtlasCall - {atlas.GetAsString()}\n" +
-                $"{index} - MRCall    - {mr.GetAsString()}\n" +
-                $"{index} - LinkCalls - {linkStatus}", false);
+                (options.SkipAtlas ? "" : $"{index} - AtlasCall - {atlas.GetAsString()}\n") +
+                (options.SkipMetadata ? "" :  $"{index} - MRCall    - {mr.GetAsString()}\n") +
+                (options.SkipLinking ? "" : $"{index} - LinkCalls - {linkStatus}"), false);
 
             atlasResults.Add(atlas);
             mrResults.Add(mr);
@@ -156,8 +156,12 @@ namespace TestIngest
 
             var time = watch.ElapsedMilliseconds;
             _processed++;
+            var status = (!options.SkipAtlas ? $"- {atlas.GetStatus()}" : "") +
+                         (!options.SkipMetadata ? $"- {mr.GetStatus()}" : "") +
+                         (!options.SkipLinking ? $"- {linkStatus}" : "") +
+                         "\n";
             Console.WriteLine($"{index} " +
-                              $"- {atlas.GetStatus()} - {mr.GetStatus()} - {linkStatus} \n" +
+                              status +
                               $"- Progress {_processed.ToString().PadLeft(pad)}/{totalFiles} ({((double) _processed / totalFiles):P1})- Took {(time - startTime):N0} ms " +
                               $"- Estimated time left: {TimeSpan.FromMilliseconds(((double) (time * totalFiles) / (_processed)) - time).TotalMinutes:N0} minutes aprox");
         }

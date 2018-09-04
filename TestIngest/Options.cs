@@ -73,17 +73,17 @@ namespace TestIngest
                 }
             }
 
-            if (args.Contains("sa"))
+            if (args.Contains("-sa"))
             {
                 SkipAtlas = true;
             }
 
-            if (args.Contains("sm"))
+            if (args.Contains("-sm"))
             {
                 SkipMetadata = true;
             }
 
-            if (args.Contains("sl"))
+            if (args.Contains("-sl") || SkipMetadata || SkipAtlas)
             {
                 SkipLinking = true;
             }

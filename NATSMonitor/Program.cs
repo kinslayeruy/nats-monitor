@@ -9,13 +9,13 @@ namespace NATSMonitor
 {
     internal class Program
     {
-        private const string URL = "nats://nats.service.owf-dev:4222";
+        private static string URL = "nats://nats.service.owf-dev:4222";
         private static string _eventName;
         private static int _eventCount;
 
         public static void Main(string[] args)
         {
-            Console.WriteLine($"NATS Monitor Tool - v1.1");
+            Console.WriteLine($"NATS Monitor Tool - v1.2");
 
             if (args == null || !args.Any())
             {
@@ -25,6 +25,10 @@ namespace NATSMonitor
 
             
             _eventName = args[0];
+            if (args.Length > 1)
+            {
+                URL = $"nats://{args[1]}";
+            }
 
             var scf = new StanConnectionFactory();
             var options = StanOptions.GetDefaultOptions();

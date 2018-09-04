@@ -1,0 +1,17 @@
+﻿<Project Synchronized="False" SyncFilter="*.ps1;*.psm1;*.psd1;*.ps1xml;*.psf;*.pss;*.xml;*.help.txt" AutoExportFunctions="False" AutoExportPS1XMLFiles="True">
+  <Version>2.1</Version>
+  <FileID>88586b59-6ebb-4573-83de-af621c31d0d8</FileID>
+  <ProjectType>1</ProjectType>
+  <Folders />
+  <Files>
+    <File Build="2">Deluxe.psd1</File>
+    <File Build="0" ExportFunctions="True">Deluxe.psm1</File>
+    <File Build="2" Shared="True" ReferenceFunction="Invoke-Compare-RvP_ps1" ExportFunctions="False">Compare-RvP.ps1</File>
+    <File Build="2" Shared="True" ReferenceFunction="Invoke-Compare_ps1" ExportFunctions="False">Compare.ps1</File>
+    <File Build="2" Shared="True" ReferenceFunction="Invoke-Send-Preparser_ps1" ExportFunctions="False">Send-Preparser.ps1</File>
+    <File Build="2" Shared="True" ReferenceFunction="Invoke-Send-Rosetta_ps1" ExportFunctions="False">Send-Rosetta.ps1</File>
+    <File Build="2" Shared="True" ReferenceFunction="Invoke-Utils_ps1" ExportFunctions="False">Utils.ps1</File>
+    <File Build="2" Shared="True" ReferenceFunction="Invoke-Test-Module_ps1" ExportFunctions="False">Test-Module.ps1</File>
+  </Files>
+  <StartupScript>C:\Sources\nats-monitor\DeluxePSModule\Test-Module.ps1</StartupScript>
+</Project>
