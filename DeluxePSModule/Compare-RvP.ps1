@@ -131,7 +131,8 @@ function Compare-RvP
 		[Parameter(ValueFromPipeline, Mandatory)]
 		[string]$File,
 		[switch]$local,
-		[switch]$showResults
+		[switch]$showResults,
+		[string[]]$ignore
 	)
 	Begin
 	{
@@ -143,7 +144,7 @@ function Compare-RvP
 				$preparserOut = "MR"
 				$LangSorts = @('record.country', 'record.language')
 				$Sorts = New-Object -TypeName System.Collections.ArrayList
-				$Sorts.Add(@('record.metadata', 'associatedOrg', 'orgName.sortName'))
+				$echo = $Sorts.Add(@('record.metadata', 'associatedOrg', 'orgName.sortName'))
 				break
 			}
 			"SonyGPMS-Atlas" {
@@ -231,7 +232,7 @@ function Compare-RvP
 		}
 		else
 		{
-			Compare-ObjectDeep -Name $Name -Base $preparser -Compare $rosetta
+			Compare-ObjectDeep -Name $Name -Base $preparser -Compare $rosetta -Ignore $ignore
 		}
 		$i++
 		Write-Progress -Activity 'Comparing Files' -Status "$i files processed" -PercentComplete -1
