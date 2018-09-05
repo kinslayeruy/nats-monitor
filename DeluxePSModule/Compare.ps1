@@ -82,7 +82,7 @@ function Compare-Arrays
 		
 		if ($Base.Count -ne $Compare.Count)
 		{
-			if ($Ignore -notcontains $Path)
+			if (IgnoreMatches -ignoreArray $Ignore -key $Path)
 			{
 				Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare array count differ ({0} != {1})' -f $Base.Count, $Compare.Count))
 			}
@@ -147,7 +147,7 @@ function Compare-ObjectDeep
 				{
 					return
 				}
-				if ($Ignore -notcontains $Path)
+				if (IgnoreMatches -ignoreArray $Ignore -key $Path)
 				{
 					Write-Output -InputObject (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base object is null (null != {0})' -f $Compare))
 				}
@@ -161,7 +161,7 @@ function Compare-ObjectDeep
 			{
 				return
 			}
-			if ($Ignore -notcontains $Path)
+			if (IgnoreMatches -ignoreArray $Ignore -key $Path)
 			{
 				Write-Output -InputObject (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Compare object is null ({0} != null)' -f $Base))
 			}
@@ -175,7 +175,7 @@ function Compare-ObjectDeep
 		
 		if ($Base.GetType().FullName -ne $Compare.GetType().FullName)
 		{
-			if ($Ignore -notcontains $Path)
+			if (IgnoreMatches -ignoreArray $Ignore -key $Path)
 			{
 				Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare object types are different ({0} != {1})' -f $Base.GetType().FullName, $Compare.GetType().FullName))
 			}
@@ -193,7 +193,7 @@ function Compare-ObjectDeep
 			$diffIndex = Compare-String $Base $Compare
 			if ($diffIndex[0] -ge 0)
 			{
-				if ($Ignore -notcontains $Path)
+				if (IgnoreMatches -ignoreArray $Ignore -key $Path)
 				{
 					Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare are not equal starting at index {0} (''{1}'' != ''{2}'')' -f $diffIndex[0], $diffIndex[1], $diffIndex[2]))
 				}
@@ -205,7 +205,7 @@ function Compare-ObjectDeep
 		{
 			if ($Base -ne $Compare)
 			{
-				if ($Ignore -notcontains $Path)
+				if (IgnoreMatches -ignoreArray $Ignore -key $Path)
 				{
 					Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare are not equal ({0} != {1})' -f $Base, $Compare))
 				}

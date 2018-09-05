@@ -67,7 +67,7 @@ function script:ReplaceWithSortedBy
 		$node = GetObjectValue -Path $pathToArray -CurrentObject $BaseObject
 		if ($null -ne $node)
 		{
-			if ($node.PSobject.Properties.Name -contains '$arrayName')
+			if ($node.PSobject.Properties.Name -contains $arrayName)
 			{
 				$node.$arrayName = Sort-ByPath -Path $PathToSortBy -InputObject $node.$arrayName
 			}

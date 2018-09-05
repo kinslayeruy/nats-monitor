@@ -9,10 +9,8 @@
 Import-Module Deluxe
 Set-Location -Path 'c:\TestData\SonyGPMS\2 - SEA'
 $Ignore = @(
-	'.Result[0].record.metadata.countryOfOrigin',
-	'.Result[0].record.metadata.originalLanguage',
-	'.Result[1].record.metadata.countryOfOrigin',
-	'.Result[1].record.metadata.originalLanguage'
+	'.Result[*].record.metadata.countryOfOrigin',
+	'.Result[*].record.metadata.originalLanguage'
 )
 ls *.xml | Compare-RvP -CompareType SonyGPMS-MR -ignore $Ignore | ForEach-Object { $_.WriteOut()}
 #ls *.xml | Send-Rosetta -template 'json.sony.gpms.canonical-metadata,json.canonical-metadata.mr' -hostName rosetta-api.service.owf-dev

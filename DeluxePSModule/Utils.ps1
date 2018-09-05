@@ -6,6 +6,12 @@
 		Helper Methods.
 #>
 
+Function IgnoreMatches([string[]]$ignoreArray, [string]$key)
+{
+	$key = $key -replace '(\[[\d]*\])', '[*]'
+	return $ignoreArray -notcontains $key
+}
+
 Function IIf($If, $Right, $Wrong)
 {
 	If ($If)
