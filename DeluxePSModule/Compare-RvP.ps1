@@ -222,6 +222,6 @@ function Compare-RvP
 	}
 	End
 	{
-		('Pocessed {0} files' -f $i)
+		Write-Host  ('Pocessed {0} files' -f $i) -ForegroundColor Green -BackgroundColor Black
 	}
 }
