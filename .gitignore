@@ -6,3 +6,4 @@ TestIngest/obj/**/*.*
 packages/
 *.user
 /.vs/*
+DeluxePSModule/Staging/
