@@ -12,6 +12,7 @@
     <File Build="2" Shared="True" ReferenceFunction="Invoke-Send-Rosetta_ps1" ExportFunctions="False">Send-Rosetta.ps1</File>
     <File Build="2" Shared="True" ReferenceFunction="Invoke-Utils_ps1" ExportFunctions="False">Utils.ps1</File>
     <File Build="2" Shared="True" ReferenceFunction="Invoke-Test-Module_ps1" ExportFunctions="False">Test-Module.ps1</File>
+    <File Build="2" Shared="True" ReferenceFunction="Invoke-Classes_ps1" ExportFunctions="False">Classes.ps1</File>
   </Files>
   <StartupScript>C:\Sources\nats-monitor\DeluxePSModule\Test-Module.ps1</StartupScript>
 </Project>

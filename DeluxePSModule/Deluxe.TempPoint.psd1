@@ -14,7 +14,7 @@
 RootModule = 'Deluxe.psm1'
 
 # Version Number
-ModuleVersion = '1.2.0'
+ModuleVersion = '1.3.0.0'
 
 # Unique Module ID
 GUID = 'c2932700-3fae-41fd-afaf-447f7ebcb747'

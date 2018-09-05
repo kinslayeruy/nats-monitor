@@ -1,19 +1,20 @@
-﻿class CompareError   { 
-
-# Properties
+﻿class CompareError   {
+	
+	# Properties
 	[string]$Name
 	[string]$Path
-	[string]$Message	
-
-# Constructors
-	CompareError ([string]$name,[string]$path, [string]$message) {
+	[string]$Message
+	
+	# Constructors
+	CompareError ([string]$name, [string]$path, [string]$message)
+	{
 		$this.Name = $name
 		$this.Message = $message
-		$this.Path = $path		
+		$this.Path = $path
 	}
 	
 	
-#Methods
+	#Methods
 	
 	[string]ToString()
 	{
@@ -45,14 +46,14 @@ function Compare-String
 		[String]$string1,
 		[String]$string2
 	)
-	if ($string1 -ceq $string2)
+	if ($string1 -eq $string2)
 	{
 		return -1
 	}
 	$diffIndex = -1
 	for ($i = 0; $i -lt $string1.Length; $i++)
 	{
-		if ($string1[$i] -cne $string2[$i])
+		if ($string1[$i] -ne $string2[$i])
 		{
 			$diffIndex = $i
 			$i = $string1.Length + 1
@@ -96,21 +97,26 @@ function Compare-Arrays
 		[string]$Name,
 		[string]$Path = '',
 		[Object[]]$Base = $null,
-		[Object[]]$Compare =  $null
+		[Object[]]$Compare = $null,
+		[string[]]$Ignore = $null
 	)
 	Process
 	{
-		Write-Debug "Array $Name $Path"
+		Write-Verbose "Array     $Name $Path"
 		
 		if ($Base.Count -ne $Compare.Count)
 		{
-			Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare array count differ ({0} != {1})' -f $Base.Count, $Compare.Count))
+			if ($Ignore -notcontains $Path)
+			{
+				Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare array count differ ({0} != {1})' -f $Base.Count, $Compare.Count))
+			}
 			return;
 		}
 		$BaseSorted = $Base | Sort-Object
 		$CompareSorted = $Compare | Sort-Object
-		for ($i=0; $i -lt $Base.Count; $i++) {
-			Compare-ObjectDeep -Name $Name -Path "$Path[$i]" -Base $Base[$i] -Compare $Compare[$i]
+		for ($i = 0; $i -lt $Base.Count; $i++)
+		{
+			Compare-ObjectDeep -Name $Name -Path "$Path[$i]" -Base $Base[$i] -Compare $Compare[$i] -Ignore $Ignore
 		}
 	}
 }
@@ -123,9 +129,10 @@ function Compare-HashTable
 		[string]$Name,
 		[string]$Path = '',
 		[HashTable]$Base = $null,
-		[HashTable]$Compare = $null
+		[HashTable]$Compare = $null,
+		[string[]]$Ignore = $null
 	)
-	Write-Debug "Hashtable $Name $Path"	
+	Write-Verbose "Hashtable $Name $Path"
 	$keys = @()
 	$keys += $Base.Keys
 	$keys += $Compare.Keys
@@ -134,7 +141,7 @@ function Compare-HashTable
 	for ($i = 0; $i -lt $keys.Count; $i++)
 	{
 		$key = $keys[$i]
-		Compare-ObjectDeep -Name $Name  -Path ('{0}.{1}' -f $Path, $key) -Base $Base."$key" -Compare $Compare."$key"
+		Compare-ObjectDeep -Name $Name -Path ('{0}.{1}' -f $Path, $key) -Base $Base."$key" -Compare $Compare."$key" -Ignore $Ignore
 	}
 }
 
@@ -146,11 +153,12 @@ function Compare-ObjectDeep
 		[string]$Name,
 		[string]$Path = '',
 		[Object]$Base = $null,
-		[Object]$Compare = $null
+		[Object]$Compare = $null,
+		[string[]]$Ignore = $null
 	)
 	Process
 	{
-		Write-Debug "Object $Name $Path"
+		Write-Verbose "Object   $Name $Path"
 		if (($null -eq $Base) -xor ($null -eq $Compare))
 		{
 			if ($null -eq $Base)
@@ -163,8 +171,11 @@ function Compare-ObjectDeep
 				{
 					return
 				}
-				Write-Output -InputObject (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base object is null (null != {0})' -f $Compare))
-				return;
+				if ($Ignore -notcontains $Path)
+				{
+					Write-Output -InputObject (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base object is null (null != {0})' -f $Compare))
+				}
+				return
 			}
 			if ($Base -is [string] -and $Base -eq '')
 			{
@@ -174,8 +185,11 @@ function Compare-ObjectDeep
 			{
 				return
 			}
-			Write-Output -InputObject (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Compare object is null ({0} != null)' -f $Base))
-			return;
+			if ($Ignore -notcontains $Path)
+			{
+				Write-Output -InputObject (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Compare object is null ({0} != null)' -f $Base))
+			}
+			return
 		}
 		
 		if (($null -eq $Base) -and ($null -eq $Compare))
@@ -185,14 +199,17 @@ function Compare-ObjectDeep
 		
 		if ($Base.GetType().FullName -ne $Compare.GetType().FullName)
 		{
-			Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare object types are different ({0} != {1}' -f $Base.GetType().FullName, $Compare.GetType().FullName))
-			return;
+			if ($Ignore -notcontains $Path)
+			{
+				Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare object types are different ({0} != {1})' -f $Base.GetType().FullName, $Compare.GetType().FullName))
+			}
+			return
 		}
 		
 		if ($Base.GetType().IsArray)
 		{
-			Compare-Arrays -Name $Name -Path $Path -Base $Base -Compare $Compare
-			return;
+			Compare-Arrays -Name $Name -Path $Path -Base $Base -Compare $Compare -Ignore $Ignore
+			return
 		}
 		
 		if ($Base -is [String])
@@ -200,19 +217,25 @@ function Compare-ObjectDeep
 			$diffIndex = Compare-String $Base $Compare
 			if ($diffIndex[0] -ge 0)
 			{
-				Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare are not equal starting at index {0} (''{1}'' != ''{2}'')' -f $diffIndex[0], $diffIndex[1], $diffIndex[2]))
+				if ($Ignore -notcontains $Path)
+				{
+					Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare are not equal starting at index {0} (''{1}'' != ''{2}'')' -f $diffIndex[0], $diffIndex[1], $diffIndex[2]))
+				}
 			}
-			return;
+			return
 		}
 		
 		if ($Base.GetType().IsPrimitive)
 		{
 			if ($Base -ne $Compare)
 			{
-				Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare are not equal ({0} != {1})' -f $Base, $Compare))
+				if ($Ignore -notcontains $Path)
+				{
+					Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare are not equal ({0} != {1})' -f $Base, $Compare))
+				}
 				return
 			}
-			return;
+			return
 		}
 		
 		if ($Base -isnot [Hashtable])
@@ -226,7 +249,7 @@ function Compare-ObjectDeep
 			[hashtable]$baseHash = $Base
 			[hashtable]$compareHash = $Compare
 		}
-		Compare-HashTable -Name $Name -Path $Path -Base $baseHash -Compare $compareHash
+		Compare-HashTable -Name $Name -Path $Path -Base $baseHash -Compare $compareHash -Ignore $Ignore
 	}
 }
 

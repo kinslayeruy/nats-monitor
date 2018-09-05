@@ -48,7 +48,7 @@ function Write-ProgressInner
 	
 	if (-Not $hideProgress)
 	{
-		Write-Progress -Activity "Sending xmls" -Status ('Processing at {0}/s' -f $perSecond) -PercentComplete -1
+		Write-Progress -Activity 'Sending xmls' -Status ('Processing at {0}/s' -f $perSecond) -PercentComplete -1
 	}
 	if ($newSecond -gt $lastSecond)
 	{

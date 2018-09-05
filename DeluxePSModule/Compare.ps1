@@ -1,28 +1,4 @@
-﻿class CompareError   {
-	
-	# Properties
-	[string]$Name
-	[string]$Path
-	[string]$Message
-	
-	# Constructors
-	CompareError ([string]$name, [string]$path, [string]$message)
-	{
-		$this.Name = $name
-		$this.Message = $message
-		$this.Path = $path
-	}
-	
-	
-	#Methods
-	
-	[string]ToString()
-	{
-		return ('{0} @ {1}, {2}' -f $this.Name, $this.Path, $this.Message)
-	}
-}
-
-function Get-HashFromObject
+﻿function Get-HashFromObject
 {
 	Param
 	(
@@ -175,7 +151,7 @@ function Compare-ObjectDeep
 				{
 					Write-Output -InputObject (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base object is null (null != {0})' -f $Compare))
 				}
-				return;
+				return
 			}
 			if ($Base -is [string] -and $Base -eq '')
 			{
@@ -189,7 +165,7 @@ function Compare-ObjectDeep
 			{
 				Write-Output -InputObject (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Compare object is null ({0} != null)' -f $Base))
 			}
-			return;
+			return
 		}
 		
 		if (($null -eq $Base) -and ($null -eq $Compare))
@@ -203,13 +179,13 @@ function Compare-ObjectDeep
 			{
 				Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare object types are different ({0} != {1})' -f $Base.GetType().FullName, $Compare.GetType().FullName))
 			}
-			return;
+			return
 		}
 		
 		if ($Base.GetType().IsArray)
 		{
 			Compare-Arrays -Name $Name -Path $Path -Base $Base -Compare $Compare -Ignore $Ignore
-			return;
+			return
 		}
 		
 		if ($Base -is [String])
@@ -222,7 +198,7 @@ function Compare-ObjectDeep
 					Write-Output (New-Object -TypeName CompareError -ArgumentList $Name, $Path, ('Base and Compare are not equal starting at index {0} (''{1}'' != ''{2}'')' -f $diffIndex[0], $diffIndex[1], $diffIndex[2]))
 				}
 			}
-			return;
+			return
 		}
 		
 		if ($Base.GetType().IsPrimitive)
@@ -235,7 +211,7 @@ function Compare-ObjectDeep
 				}
 				return
 			}
-			return;
+			return
 		}
 		
 		if ($Base -isnot [Hashtable])

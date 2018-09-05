@@ -1,9 +1,22 @@
 ﻿<#	
-	.DESCRIPTION
-		Util functions.
 	.NOTES
-		Author: Juan Estrada
+	 Author:   	Juan Estrada
+	 
+	.DESCRIPTION
+		Helper Methods.
 #>
+
+Function IIf($If, $Right, $Wrong)
+{
+	If ($If)
+	{
+		$Right
+	}
+	Else
+	{
+		$Wrong
+	}
+}
 
 function Write-ErrorInner
 {
@@ -48,7 +61,7 @@ function Write-ProgressInner
 	
 	if (-Not $hideProgress)
 	{
-		Write-Progress -Activity "Sending xmls" -Status ('Processing at {0}/s' -f $perSecond) -PercentComplete -1
+		Write-Progress -Activity 'Sending xmls' -Status ('Processing at {0}/s' -f $perSecond) -PercentComplete -1
 	}
 	if ($newSecond -gt $lastSecond)
 	{

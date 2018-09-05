@@ -1,4 +1,6 @@
-﻿<#
+﻿function Send-Preparser
+{
+  <#
 	.SYNOPSIS
 		Sends XMLs to Transform-Preparser
 	
@@ -35,8 +37,6 @@
 	.NOTES
 		Author: Juan Estrada
 #>
-function Send-Preparser
-{
 	Param (
 		[Parameter(Mandatory, ValueFromPipeline)]
 		[string]$file,
@@ -104,7 +104,7 @@ function Send-Preparser
 	{
 		$xml = [IO.File]::ReadAllLines((Resolve-Path -Path $file))
 		$name = Split-Path -Path $file -Leaf
-		Write-Verbose "PP - Processing $name"
+		Write-Verbose -Message ('PP - Processing {0}' -f $name)
 		$encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xml))
 		$json = ('{{ "ingestURN": "{0}", "content": "{1}"}}' -f $name, $encoded)
 		$hdrs = @{ }
@@ -115,33 +115,36 @@ function Send-Preparser
 			{
 				$progressPreference = 'silentlyContinue'
 			}
-			Write-Verbose "PP - Calling $route"
+			Write-Verbose -Message ('PP - Calling {0}' -f $route)
 			$response = Invoke-RestMethod -Uri $route -Method POST -Headers $hdrs -Body $json -ErrorAction Ignore
 			$progressPreference = 'Continue'
 			
 			if (-Not $response.succeeded)
 			{
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $dashLine
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ('{0} had errors:' -f $name)
-				foreach ($res in $response.results)
+				if ($showResults -or $writeError)
 				{
-					foreach ($err in $res.errors)
+					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $dashLine
+					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ('{0} had errors:' -f $name)
+					foreach ($res in $response.results)
 					{
-						Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ("`t{0}" -f $err)
+						foreach ($err in $res.errors)
+						{
+							Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ("`t{0}" -f $err)
+						}
 					}
+					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ''
 				}
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ''
 				$props = @{ }
 				$props.Name = $name
 				$props.Success = $response.succeeded
 				$props.Result = $response
-				$out = New-Object -TypeName psobject -Property $props
+				$out = New-Object -TypeName PSObject -Property $props
 				Write-Output -InputObject $out
-				Write-Verbose "PP - Transformation was NOT successful"
+				Write-Verbose -Message 'PP - Transformation was NOT successful'
 			}
 			else
 			{
-				Write-Verbose "PP - Transformation was successful"
+				Write-Verbose -Message 'PP - Transformation was successful'
 				if ($showResults)
 				{
 					$dashLine
@@ -156,14 +159,17 @@ function Send-Preparser
 				}
 				else
 				{
-					Write-Host "`r" -NoNewline
+					if (-not $hideProgress)
+					{
+						Write-Host "`r" -NoNewline
+					}
 					$props = @{ }
 					$props.Name = $name
 					$props.Success = $response.succeeded
 					$props.Result = $response.results | Select-Object -ExpandProperty transformation | ConvertFrom-Json
-					$out = New-Object -TypeName psobject -Property $props
+					$out = New-Object -TypeName PSObject -Property $props
 					Write-Output -InputObject $out
-					Write-Verbose "PP - Found $($out.Result.Count) results"
+					Write-Verbose -Message ('PP - Found {0} results' -f $out.Result.Count)
 				}
 			}
 			
@@ -179,7 +185,7 @@ function Send-Preparser
 		}
 		catch
 		{
-			Write-Verbose "PP - Exception calling route $_"
+			Write-Verbose -Message ('PP - Exception calling route {0}' -f $_)
 			$exception = $_.Exception.GetBaseException()
 			if ($null -ne $_.Exception.Response)
 			{
@@ -189,20 +195,23 @@ function Send-Preparser
 				$reader.DiscardBufferedData()
 				$responseBody = $reader.ReadToEnd()
 			}
-			Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $dashLine
-			Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ('{0} had exception:' -f $name)
-			Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $exception.Message
-			if ($null -ne $responseBody)
+			if ($showResults -or $writeError)
 			{
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite 'Response Message:'
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $responseBody
+				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $dashLine
+				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ('{0} had exception:' -f $name)
+				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $exception.Message
+				if ($null -ne $responseBody)
+				{
+					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite 'Response Message:'
+					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $responseBody
+				}
+				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ''
 			}
-			Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ''
 			$props = @{ }
 			$props.Name = $name
 			$props.Success = $false
 			$props.Result = $exception
-			$out = New-Object -TypeName psobject -Property $props
+			$out = New-Object -TypeName PSObject -Property $props
 			Write-Output -InputObject $out
 		}
 	}

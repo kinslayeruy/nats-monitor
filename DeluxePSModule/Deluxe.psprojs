@@ -4,12 +4,13 @@
   <OpenFolders />
   <OpenFiles>
     <File>Test-Module.ps1</File>
-    <File>Compare-RvP.ps1</File>
     <File>Compare.ps1</File>
+    <File>Compare-RvP.ps1</File>
     <File>Send-Rosetta.ps1</File>
     <File>Send-Preparser.ps1</File>
     <File>Deluxe.psm1</File>
-    <File>Deluxe.psd1</File>
     <File>Utils.ps1</File>
+    <File>Classes.ps1</File>
+    <File>Deluxe.psd1</File>
   </OpenFiles>
 </ProjectState>

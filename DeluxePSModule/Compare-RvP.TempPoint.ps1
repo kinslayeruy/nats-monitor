@@ -1,20 +1,28 @@
-﻿function GetObjectValue
+﻿function script:GetObjectValue
 {
 	Param (
-		[string]$Path,
-		[object]$CurrentObject
+		[string]$Path = '',
+		[object]$CurrentObject = $null
 	)
 	Process
 	{
+		if ($null -eq $CurrentObject)
+		{
+			return $null
+		}
+		if ($Path -eq '')
+		{
+			return $CurrentObject
+		}
 		$nav = $Path.Split('.')[0]
 		if ($nav -eq $Path)
 		{
-			return $CurrentObject."$nav"
+			return $CurrentObject.('{0}' -f $nav)
 		}
-		return GetObjectValue -Path $Path.Remove(0, $nav.Length + 1) -CurrentObject $CurrentObject."$nav"
+		return GetObjectValue -Path $Path.Remove(0, $nav.Length + 1) -CurrentObject $CurrentObject.('{0}' -f $nav)
 	}
 }
-function Sort-ByPath
+function script:Sort-ByPath
 {
 	Param (
 		[string]$Path = '',
@@ -24,7 +32,7 @@ function Sort-ByPath
 	{
 		if ($null -eq $InputObject)
 		{
-			return;
+			return
 		}
 		if ($Path -eq '' -and $InputObject -is [Array])
 		{
@@ -33,10 +41,11 @@ function Sort-ByPath
 		if ($InputObject -is [Array])
 		{
 			$sorted = @()
-			foreach ($item in $InputObject) {
+			foreach ($item in $InputObject)
+			{
 				$sort = [pscustomobject] @{
 					SortBy = GetObjectValue -Path $Path -CurrentObject $item
-					Value = $item
+					Value  = $item
 				}
 				$sorted += $sort
 			}
@@ -45,7 +54,7 @@ function Sort-ByPath
 	}
 }
 
-function ReplaceWithSortedBy
+function script:ReplaceWithSortedBy
 {
 	Param (
 		[string]$PathToArray = '',
@@ -55,98 +64,94 @@ function ReplaceWithSortedBy
 	)
 	Process
 	{
-		$node = GetObjectValue -Path $pathToArray -CurrentObject $BaseObject;
-		$node.$arrayName = Sort-ByPath -Path $PathToSortBy -InputObject $node.$arrayName
+		$node = GetObjectValue -Path $pathToArray -CurrentObject $BaseObject
+		if ($null -ne $node)
+		{
+			$node.$arrayName = Sort-ByPath -Path $PathToSortBy -InputObject $node.$arrayName
+		}
 	}
 }
 
-#$test = @{
-#	Route = @{
-#		ArrayDec = @([pscustomobject]@{
-#				Test = [pscustomobject]@{
-#					Inner = @('hola', 'aa')
-#					BySort = 'z'
-#				}
-#				Another = 2
-#			}, [pscustomobject]@{
-#				Test = [pscustomobject]@{
-#					Inner = @('hola', 'aa')
-#					BySort = 'b'
-#				}
-#				Another = 2
-#			})
-#	}
-#}
-#$test.Route.ArrayDec | Select-Object Test
-#ReplaceWithSortedBy -PathToArray 'Route' -arrayName 'ArrayDec' -BaseObject $test -PathToSortBy 'Test.BySort'
-#$test.Route.ArrayDec | Select-Object Test
-
+function Compare-RvP
+{
 <#
 	.SYNOPSIS
 		Compares Rosetta vs Preparser output.
-	
-	.DESCRIPTION
+  .DESCRIPTION
 		Will send XMLs to Send-Rosetta and Send-Preparser and compare the results.
-	
+
 	.PARAMETER CompareType
 		Will define the parameters for both Rosetta tempate and Preparser inFormat and outFormat. Possible values are 'SonyGPMS-MR', 'SonyGPMS-Atlas', 'SonyAlpha-MR', 'SonyAlpha-Atlas'
 			'SonyGPMS-MR' 		-> Rosetta: 'json.sony.gpms.canonical-metadata,json.canonical-metadata.mr' Preparser: GPMS , MR
 			'SonyGPMS-Atlas' 	-> Rosetta: 'json.sony.gpms.canonical-metadata,json.canonical-metadata.atlas' Preparser: GPMS , Atlas
 			'SonyAlpha-MR'		-> Rosetta: 'json.sony.atlas.canonical-metadata,json.canonical-metadata.mr' Preparser: Alpha , MR
 			'SonyAlpha-Atlas'   -> Rosetta: 'json.sony.atlas.canonical-metadata,json.canonical-metadata.atlas' Preparser: Alpha , Atlas
-	
+
 	.PARAMETER File
 		The XML to process, this parameter can be piped in.
-	
+
 	.PARAMETER Sorts
 		Additional sortings (in progress).
-	
+
 	.PARAMETER local
 		If local is set, the localhost containers are used, if not, the owf-dev services are used for calls.
-	
+
 	.EXAMPLE
 		Compare-RvP -CompareType SonyGPMS-MR -File '.\1075.xml'
-	
+
 	.NOTES
 		Author: Juan Estrada
 #>
-function Compare-RvP
-{
 	Param (
 		[ValidateSet('SonyGPMS-MR', 'SonyGPMS-Atlas', 'SonyAlpha-MR', 'SonyAlpha-Atlas')]
 		[Parameter(Mandatory)]
 		[string]$CompareType,
 		[Parameter(ValueFromPipeline, Mandatory)]
 		[string]$File,
-		[string[][]]$Sorts = $null,
-		[switch]$local
+		[switch]$local,
+		[switch]$showResults,
+		[string[]]$ignore = $null
 	)
 	Begin
 	{
 		switch ($CompareType)
 		{
-			"SonyGPMS-MR" {
-				$rosettaTemplate = "json.sony.gpms.canonical-metadata,json.canonical-metadata.mr"
-				$preparserIn = "SonyGPMS"
-				$preparserOut = "MR"
+			'SonyGPMS-MR' {
+				$rosettaTemplate = 'json.sony.gpms.canonical-metadata,json.canonical-metadata.mr'
+				$preparserIn = 'SonyGPMS'
+				$preparserOut = 'MR'
+				$LangSorts = @('record.country', 'record.language')
+				$Sorts = New-Object -TypeName System.Collections.ArrayList
+				$echo = $Sorts.Add(@('record.metadata', 'associatedOrg', 'orgName.sortName'))
 				break
 			}
-			"SonyGPMS-Atlas" {
-				$rosettaTemplate = "json.sony.gpms.canonical-metadata,json.canonical-metadata.atlas"
-				$preparserIn = "SonyGPMS"
-				$preparserOut = "Atlas"
+			'SonyGPMS-Atlas' {
+				$rosettaTemplate = 'json.sony.gpms.canonical-metadata,json.canonical-metadata.atlas'
+				$preparserIn = 'SonyGPMS'
+				$preparserOut = 'Atlas'
+				$Sorts = New-Object -TypeName System.Collections.ArrayList
+				$echo = $Sorts.Add(@('feature', 'references', 'value'))
+				$echo = $Sorts.Add(@('feature', 'references', 'type'))
+				$echo = $Sorts.Add(@('series', 'references', 'value'))
+				$echo = $Sorts.Add(@('series', 'references', 'type'))
+				$echo = $Sorts.Add(@('episode', 'references', 'value'))
+				$echo = $Sorts.Add(@('episode', 'references', 'type'))
+				$echo = $Sorts.Add(@('version', 'references', 'value'))
+				$echo = $Sorts.Add(@('version', 'references', 'type'))
 				break
 			}
-			"SonyAlpha-MR" {
-				$rosettaTemplate = "json.sony.alpha.canonical-metadata,json.canonical-metadata.mr"
-				$preparserIn = "SonyAlpha"
-				$preparserOut = "MR"
+			'SonyAlpha-MR' {
+				$rosettaTemplate = 'json.sony.alpha.canonical-metadata,json.canonical-metadata.mr'
+				$preparserIn = 'SonyAlpha'
+				$preparserOut = 'MR'
 				break
 			}
-			"SonyAlpha-Atlas" {
-				$rosettaTemplate = "json.sony.alpha.canonical-metadata,json.canonical-metadata.atlas"
-				$preparserIn = "SonyAlpha"
-				$preparserOut = "Atlas"
+			'SonyAlpha-Atlas' {
+				$rosettaTemplate = 'json.sony.alpha.canonical-metadata,json.canonical-metadata.atlas'
+				$preparserIn = 'SonyAlpha'
+				$preparserOut = 'Atlas'
+				$Sorts = New-Object -TypeName System.Collections.ArrayList
+				$echo = $Sorts.Add(@('version', 'references', 'type'))
 				break
 			}
 		}
@@ -165,20 +170,53 @@ function Compare-RvP
 	Process
 	{
 		
+		Write-Verbose -Message 'Calling rosetta'
 		$rosetta = (Send-Rosetta -file $File -template $rosettaTemplate -hostName $rosettaRoute -hideProgress)
-		
+		Write-Verbose -Message ('Calling preparser')
 		$preparser = (Send-Preparser -file $File -inFormat $preparserIn -outFormat $preparserOut -hostName $preparserRoute -hideProgress)
+		
+		if ($null -ne $LangSorts)
+		{
+			foreach ($LangSort in $LangSorts)
+			{
+				ReplaceWithSortedBy -PathToArray '' -arrayName 'Result' -PathToSortBy $LangSort -BaseObject $rosetta
+				ReplaceWithSortedBy -PathToArray '' -arrayName 'Result' -PathToSortBy $LangSort -BaseObject $preparser
+			}
+		}
+		
 		if ($null -ne $Sorts)
 		{
 			foreach ($Sort in $Sorts)
 			{
-				ReplaceWithSortedBy -PathToArray $Sort[0] -arrayName $Sort[1] -PathToSortBy $Sort[2] -BaseObject $rosetta
-				ReplaceWithSortedBy -PathToArray $Sort[0] -arrayName $Sort[1] -PathToSortBy $Sort[2] -BaseObject $preparser
+				foreach ($rosettaResult in $rosetta.Result)
+				{
+					ReplaceWithSortedBy -PathToArray $Sort[0] -arrayName $Sort[1] -PathToSortBy $Sort[2] -BaseObject $rosettaResult
+				}
+				foreach ($preparserResult in $preparser.Result)
+				{
+					ReplaceWithSortedBy -PathToArray $Sort[0] -arrayName $Sort[1] -PathToSortBy $Sort[2] -BaseObject $preparserResult
+				}
 			}
 		}
 		$Name = Split-Path -Path $File -Leaf
-		Compare-ObjectDeep -Name $Name -Base $preparser -Compare $rosetta
+		if ($showResults)
+		{
+			'Rosetta: ['
+			$rosetta.Result | ForEach-Object { ConvertTo-Json -Depth 100 -Compress -InputObject $_ }
+			']'
+			'Preparser: ['
+			$preparser.Result | ForEach-Object { ConvertTo-Json -Depth 100 -Compress -InputObject $_ }
+			']'
+		}
+		else
+		{
+			Compare-ObjectDeep -Name $Name -Base $preparser -Compare $rosetta -Ignore $ignore
+		}
 		$i++
-		Write-Progress -Activity 'Comparing Files' -Status "$i files processed" -PercentComplete -1
+		Write-Progress -Activity 'Comparing Files' -Status ('{0} files processed' -f $i) -PercentComplete -1
+	}
+	End
+	{
+		('Pocessed {0} files' -f $i)
 	}
 }
