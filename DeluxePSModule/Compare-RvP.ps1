@@ -67,7 +67,10 @@ function script:ReplaceWithSortedBy
 		$node = GetObjectValue -Path $pathToArray -CurrentObject $BaseObject
 		if ($null -ne $node)
 		{
-			$node.$arrayName = Sort-ByPath -Path $PathToSortBy -InputObject $node.$arrayName
+			if ($node.PSobject.Properties.Name -contains '$arrayName')
+			{
+				$node.$arrayName = Sort-ByPath -Path $PathToSortBy -InputObject $node.$arrayName
+			}
 		}
 	}
 }
@@ -124,6 +127,7 @@ function Compare-RvP
 				$Sorts = New-Object -TypeName System.Collections.ArrayList
 				$echo = $Sorts.Add(@('record.metadata', 'associatedOrg', 'role'))
 				$echo = $Sorts.Add(@('record.metadata', 'associatedOrg', 'orgName.sortName'))
+				$echo = $Sorts.Add(@('record.metadata', 'releaseHistory', 'description'))
 				break
 			}
 			'SonyGPMS-Atlas' {
