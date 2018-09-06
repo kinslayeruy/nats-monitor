@@ -107,8 +107,8 @@
 		Write-Verbose -Message ('PP - Processing {0}' -f $name)
 		$encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xml))
 		$json = ('{{ "ingestURN": "{0}", "content": "{1}"}}' -f $name, $encoded)
-		$hdrs = @{ }
-		$hdrs.Add('Content-Type', 'application/json')
+		$hdrs = @{ 'Content-Type' = 'application/json' }
+		
 		try
 		{
 			if ($hideProgress)
@@ -134,11 +134,7 @@
 					}
 					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ''
 				}
-				$props = @{ }
-				$props.Name = $name
-				$props.Success = $response.succeeded
-				$props.Result = $response
-				$out = New-Object -TypeName PSObject -Property $props
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, ($response.results | Select-Object -ExpandProperty errors)
 				Write-Output -InputObject $out
 				Write-Verbose -Message 'PP - Transformation was NOT successful'
 			}
@@ -159,15 +155,11 @@
 				}
 				else
 				{
-					if (-not $hideProgress)
+					if ($showResults)
 					{
 						Write-Host "`r" -NoNewline
 					}
-					$props = @{ }
-					$props.Name = $name
-					$props.Success = $response.succeeded
-					$props.Result = $response.results | Select-Object -ExpandProperty transformation | ConvertFrom-Json
-					$out = New-Object -TypeName PSObject -Property $props
+					$out = New-Object -TypeName SendResult -ArgumentList $name, $true, ($response.results | Select-Object -ExpandProperty transformation | ConvertFrom-Json)
 					Write-Output -InputObject $out
 					Write-Verbose -Message ('PP - Found {0} results' -f $out.Result.Count)
 				}
@@ -207,11 +199,7 @@
 				}
 				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ''
 			}
-			$props = @{ }
-			$props.Name = $name
-			$props.Success = $false
-			$props.Result = $exception
-			$out = New-Object -TypeName PSObject -Property $props
+			$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception)
 			Write-Output -InputObject $out
 		}
 	}

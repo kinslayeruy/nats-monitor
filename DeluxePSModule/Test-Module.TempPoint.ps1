@@ -1,31 +1,25 @@
 ﻿<#	
 	.NOTES
-	===========================================================================
-	 Created with: 	SAPIEN Technologies, Inc., PowerShell Studio 2018 v5.5.154
-	 Created on:   	9/3/2018 2:41 PM
-	 Created by:   	JEstrada
-	 Organization: 	
-	 Filename:     	Test-Module.ps1
-	===========================================================================
+	 Author:   	Juan Estrada
+
 	.DESCRIPTION
-		A description of the file.
+		A test for the module.
 #>
 
 Import-Module Deluxe
-Set-Location -Path 'c:\TestData\SonyGPMS\1 - SER'
+Set-Location -Path 'c:\TestData\LoadTests'
 $Ignore = @(
-	'.Result[0].record.metadata.countryOfOrigin',
-	'.Result[0].record.metadata.originalLanguage',
-	'.Result[1].record.metadata.countryOfOrigin',
-	'.Result[1].record.metadata.originalLanguage'
+	  '.Result[*].record.metadata.countryOfOrigin'
+	, '.Result[*].record.metadata.originalLanguage'
 )
-#ls *.xml | Compare-RvP -CompareType SonyGPMS-MR -ignore $Ignore | Format-List
 
-#ls TitleMaster_20180312175308_WALKERYS_SRS_20180312055308_GPMS-50000.xml | Compare-RvP -CompareType SonyGPMS-Atlas | Format-List
-$toTest = 'TitleMaster_20180312175223_WALKERYS_SRS_20180312061954_GPMS-12508.xml'
-cat $toTest
-$result = (Send-Rosetta -template 'json.sony.gpms.canonical-metadata' -hostName rosetta-api.service.owf-dev -file $toTest).Result
-$result.basicMetadata | ConvertTo-Json
+#Get-ChildItem *.xml | Select-Object -First 1000 | Compare-RvP -CompareType SonyGPMS-Atlas -ignore $Ignore | ForEach-Object { $_.WriteOut() } | Out-File -FilePath 'compare-errors.log' -Force -Encoding ascii
+
+$toTest = 'TitleMaster_20180312175223_WALKERYS_NEPS_20180312063344_GPMS-25173.xml'
+Get-Content $toTest
+(Send-Rosetta -template 'json.sony.gpms.canonical-metadata,json.canonical-metadata.mr' -hostName localhost:35010 -file $toTest -Verbose).WriteOut()
+#(Send-Preparser -inFormat SonyGPMS -outFormat MR -hostName transform-preparser.service.owf-dev -file $toTest -Verbose).WriteOut()
+#Compare-RvP -CompareType SonyGPMS-Atlas -ignore $Ignore -File $toTest | ForEach-Object { $_.WriteOut() }
 
 #Compare-RvP -CompareType SonyGPMS-MR -File $toTest | Format-List
 #Compare-RvP -CompareType SonyGPMS-MR -File $toTest -showResults

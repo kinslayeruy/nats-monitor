@@ -7,3 +7,4 @@ packages/
 *.user
 /.vs/*
 DeluxePSModule/Staging/
+*.TempPoint.*

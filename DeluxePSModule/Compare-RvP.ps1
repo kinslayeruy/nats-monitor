@@ -106,7 +106,7 @@ function Compare-RvP
 		Author: Juan Estrada
 #>
 	Param (
-		[ValidateSet('SonyGPMS-MR', 'SonyGPMS-Atlas', 'SonyAlpha-MR', 'SonyAlpha-Atlas')]
+		[ValidateSet('SonyGPMS-MR', 'SonyGPMS-Atlas', 'SonyAlpha-MR', 'SonyAlpha-Atlas', 'SonyDBB-Atlas')]
 		[Parameter(Mandatory)]
 		[string]$CompareType,
 		[Parameter(ValueFromPipeline, Mandatory)]
@@ -157,6 +157,12 @@ function Compare-RvP
 				$preparserOut = 'Atlas'
 				$Sorts = New-Object -TypeName System.Collections.ArrayList
 				$echo = $Sorts.Add(@('version', 'references', 'type'))
+				break
+			}
+			'SonyDBB-Atlas' {
+				$rosettaTemplate = 'json.sony.dbb.canonical-manifest,json.canonical-manifest.atlas'
+				$preparserIn = 'SonyDBB'
+				$preparserOut = 'Atlas'
 				break
 			}
 		}

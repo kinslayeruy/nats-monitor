@@ -67,7 +67,10 @@ function script:ReplaceWithSortedBy
 		$node = GetObjectValue -Path $pathToArray -CurrentObject $BaseObject
 		if ($null -ne $node)
 		{
-			$node.$arrayName = Sort-ByPath -Path $PathToSortBy -InputObject $node.$arrayName
+			if ($node.PSobject.Properties.Name -contains $arrayName)
+			{
+				$node.$arrayName = Sort-ByPath -Path $PathToSortBy -InputObject $node.$arrayName
+			}
 		}
 	}
 }
@@ -122,7 +125,9 @@ function Compare-RvP
 				$preparserOut = 'MR'
 				$LangSorts = @('record.country', 'record.language')
 				$Sorts = New-Object -TypeName System.Collections.ArrayList
+				$echo = $Sorts.Add(@('record.metadata', 'associatedOrg', 'role'))
 				$echo = $Sorts.Add(@('record.metadata', 'associatedOrg', 'orgName.sortName'))
+				$echo = $Sorts.Add(@('record.metadata', 'releaseHistory', 'description'))
 				break
 			}
 			'SonyGPMS-Atlas' {
@@ -171,9 +176,9 @@ function Compare-RvP
 	{
 		
 		Write-Verbose -Message 'Calling rosetta'
-		$rosetta = (Send-Rosetta -file $File -template $rosettaTemplate -hostName $rosettaRoute -hideProgress)
+		[SendResult]$rosetta = (Send-Rosetta -file $File -template $rosettaTemplate -hostName $rosettaRoute -hideProgress)
 		Write-Verbose -Message ('Calling preparser')
-		$preparser = (Send-Preparser -file $File -inFormat $preparserIn -outFormat $preparserOut -hostName $preparserRoute -hideProgress)
+		[SendResult]$preparser = (Send-Preparser -file $File -inFormat $preparserIn -outFormat $preparserOut -hostName $preparserRoute -hideProgress)
 		
 		if ($null -ne $LangSorts)
 		{
@@ -217,6 +222,6 @@ function Compare-RvP
 	}
 	End
 	{
-		('Pocessed {0} files' -f $i)
+		Write-Host  ('Pocessed {0} files' -f $i) -ForegroundColor Green -BackgroundColor Black
 	}
 }

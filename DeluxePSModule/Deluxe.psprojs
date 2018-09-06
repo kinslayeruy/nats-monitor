@@ -8,5 +8,6 @@
     <File>Compare-RvP.ps1</File>
     <File>Send-Rosetta.ps1</File>
     <File>Send-Preparser.ps1</File>
+    <File>Classes.ps1</File>
   </OpenFiles>
 </ProjectState>

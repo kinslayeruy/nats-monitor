@@ -41,7 +41,7 @@
 		[Parameter(Mandatory, ValueFromPipeline)]
 		[string]$file,
 		[string]$hostName = 'localhost:5020',
-		[ValidateSet('MR', 'Atlas', 'Asset')]
+		[ValidateSet('MR', 'Atlas')]
 		[Parameter(Mandatory)]
 		[string]$outFormat,
 		[ValidateSet('SonyGPMS', 'SonyAlpha', 'SonyDBB')]
@@ -70,11 +70,7 @@
 			'Atlas' {
 				$route = ('http://{0}/v1/preparse/oneingest-titleToAtlas-transform' -f $hostName)
 				break
-			}
-			'Asset' {
-				$route = ('http://{0}/v1/preparse/oneingest-asset-transformations' -f $hostName)
-				break
-			}
+			}			
 		}
 		switch ($inFormat)
 		{
@@ -87,11 +83,11 @@
 				break
 			}
 			'SonyDBB' {
-				$route = $route + '?provider=sony&inputFormat=dbb'
+				$route = ('http://{0}/v1/preparse/oneingest-asset-transformations?provider=sony&outputFormat=atlas' -f $hostName)
 				break
 			}
 		}
-		
+		Write-Verbose ('Route: {0}' -f $route)
 		$i = 0
 		$lastSecond = 0
 		$lastIndex = 0
@@ -159,7 +155,14 @@
 					{
 						Write-Host "`r" -NoNewline
 					}
-					$out = New-Object -TypeName SendResult -ArgumentList $name, $true, ($response.results | Select-Object -ExpandProperty transformation | ConvertFrom-Json)
+					if ($inFormat -eq 'SonyDBB')
+					{
+						$out = New-Object -TypeName SendResult -ArgumentList $name, $true, @(($response.document | ConvertFrom-Json))
+					}
+					else
+					{
+						$out = New-Object -TypeName SendResult -ArgumentList $name, $true, ($response.results | Select-Object -ExpandProperty transformation | ConvertFrom-Json)
+					}
 					Write-Output -InputObject $out
 					Write-Verbose -Message ('PP - Found {0} results' -f $out.Result.Count)
 				}
