@@ -37,35 +37,61 @@ class SendResult
 	[string]$Name
 	[bool]$Success
 	[Array]$Result
+	[string]$Module
 	
 	# Constructors
-	SendResult ([string]$name, [bool]$success, [Array]$result)
+	SendResult ([string]$name, [bool]$success, [Array]$result, [string]$module)
 	{
 		$this.Name = $name
 		$this.Success = $success
 		$this.Result = $result
+		$this.Module = $module
 	}
 	
+	WriteIfError()
+	{
+		if (-not $this.Success)
+		{
+			$this.WriteOut()
+		}
+		else
+		{
+			$this.WriteStatus()
+		}
+	}
+	
+	WriteStatus()
+	{
+		Write-Host -NoNewline "$($this.Module)" -ForegroundColor Cyan
+		Write-Host -NoNewline ' -'
+		Write-Host -NoNewline " $($this.Name)" -ForegroundColor Cyan
+		Write-Host -NoNewline ' returned '
+		if ($this.Success)
+		{
+			Write-Host ' Success' -ForegroundColor Green
+		}
+		else
+		{
+			Write-Host ' Failure' -ForegroundColor Red
+		}
+	}
 	
 	#Methods	
-	[string]WriteOut()
+	WriteOut()
 	{
-		$ret = New-Object -TypeName System.Collections.ArrayList
-		$ret.Add("$($this.Name) status $(IIF $this.Success 'Success' 'Failure')`r`n")
-		
+		$this.WriteStatus()
 		foreach ($item in $this.Result)
 		{
 			if ($item -is [string])
 			{
-				$ret.Add("`t$item`r`n")
+				Write-Host "`t$item"
 			}
 			else
 			{
-				$ret.Add("`t$(ConvertTo-Json -InputObject $item -Depth 100 -Compress)`r`n")
+				Write-Host "`t$(ConvertTo-Json -InputObject $item -Depth 100 -Compress)"				
 			}
 		}
-		
-		return $ret
+		Write-Host ' '
 	}
 }
 

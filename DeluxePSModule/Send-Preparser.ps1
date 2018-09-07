@@ -98,7 +98,7 @@
 			
 			if (-Not $response.succeeded)
 			{
-				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, ($response.results | Select-Object -ExpandProperty errors)
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, ($response.results | Select-Object -ExpandProperty errors), 'Preparser'
 				Write-Output -InputObject $out
 				Write-Verbose -Message 'PP - Transformation was NOT successful'
 			}
@@ -107,11 +107,11 @@
 				Write-Verbose -Message 'PP - Transformation was successful'
 				if ($inFormat -eq 'SonyDBB')
 				{
-					$out = New-Object -TypeName SendResult -ArgumentList $name, $true, @(($response.document | ConvertFrom-Json))
+					$out = New-Object -TypeName SendResult -ArgumentList $name, $true, @(($response.document | ConvertFrom-Json)), 'Preparser'
 				}
 				else
 				{
-					$out = New-Object -TypeName SendResult -ArgumentList $name, $true, ($response.results | Select-Object -ExpandProperty transformation | ConvertFrom-Json)
+					$out = New-Object -TypeName SendResult -ArgumentList $name, $true, ($response.results | Select-Object -ExpandProperty transformation | ConvertFrom-Json), 'Preparser'
 				}
 				Write-Output -InputObject $out
 				Write-Verbose -Message ('PP - Found {0} results' -f $out.Result.Count)
@@ -120,7 +120,7 @@
 			$i++
 			if (-not $hideProgress)
 			{
-				$progress = Write-ProgressInner -lastSecond $lastSecond -lastIndex $lastIndex -i $i -perSecond $perSecond -stopwatch $stopWatch
+				$progress = Write-ProgressInner -lastSecond $lastSecond -lastIndex $lastIndex -i $i -perSecond $perSecond -stopwatch $stopWatch -current $name
 				$lastSecond = $progress[0]
 				$lastIndex = $progress[1]
 				$perSecond = $progress[2]
@@ -138,11 +138,11 @@
 				$reader.BaseStream.Position = 0
 				$reader.DiscardBufferedData()
 				$responseBody = $reader.ReadToEnd()
-				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception, $responseBody)
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception, $responseBody), 'Preparser'
 			}
 			else
 			{
-				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception)
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception), 'Preparser'
 			}
 			Write-Output -InputObject $out
 		}

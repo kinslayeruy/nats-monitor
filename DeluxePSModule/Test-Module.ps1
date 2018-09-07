@@ -13,7 +13,7 @@ $Ignore = @(
 	, '.Result[*].record.metadata.originalLanguage'
 	, '.Result[*].version.status'
 )
-
+Get-ChildItem *.xml | Select-Object -first 100 | Send-Ingest -ingestType Full -providerInputFormat SonyGPMS -hostName metadata-ingest.service.owf-dev | ForEach-Object { $_.WriteOut() }
 #Get-ChildItem *.xml | Select-Object -Skip 300 | Compare-RvP -CompareType SonyAlpha-Atlas -ignore $Ignore | ForEach-Object { $_.WriteOut() }
 
 #Get-ChildItem *.xml | Select-Object -First 10 | Send-Ingest -Verbose -hostName 'metadata-ingest.service.owf-dev' -ingestType Atlas -providerInputFormat SonyGPMS | ForEach-Object { $_.WriteOut() }

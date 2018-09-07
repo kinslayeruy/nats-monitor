@@ -73,14 +73,14 @@
 			
 			if (-Not $response.success)
 			{
-				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, $response.errors
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, $response.errors, 'Rosetta'
 				Write-Output -InputObject $out
 				Write-Verbose -Message 'R  - Transformation was NOT successful'
 			}
 			else
 			{
 				Write-Verbose -Message 'R  - Transformation was successful'
-				$out = New-Object -TypeName SendResult -ArgumentList $name, $true, ($response.transformResults | ConvertFrom-Json)
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $true, ($response.transformResults | ConvertFrom-Json), 'Rosetta'
 				Write-Output -InputObject $out
 				Write-Verbose -Message ('R  - Found {0} results' -f $out.Result.Count)
 			}
@@ -88,7 +88,7 @@
 			$i++
 			if (-Not $hideProgress)
 			{
-				$progress = Write-ProgressInner -lastSecond $lastSecond -lastIndex $lastIndex -i $i -perSecond $perSecond -stopwatch $stopWatch
+				$progress = Write-ProgressInner -lastSecond $lastSecond -lastIndex $lastIndex -i $i -perSecond $perSecond -stopwatch $stopWatch -current $name
 				$lastSecond = $progress[0]
 				$lastIndex = $progress[1]
 				$perSecond = $progress[2]
@@ -105,11 +105,11 @@
 				$reader.BaseStream.Position = 0
 				$reader.DiscardBufferedData()
 				$responseBody = $reader.ReadToEnd()
-				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception, $responseBody)
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception, $responseBody), 'Rosetta'
 			}
 			else
 			{
-				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception)
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception), 'Rosetta'
 			}
 			Write-Output -InputObject $out
 		}

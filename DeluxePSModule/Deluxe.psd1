@@ -56,7 +56,7 @@ RequiredModules = @()
 RequiredAssemblies = @()
 
 # PowerShell Scripts (.ps1) that need to be executed before this module loads
-ScriptsToProcess = @('.\Classes.ps1')
+ScriptsToProcess = @('.\Classes.ps1', '.\Utils.ps1')
 
 # Type files (.ps1xml) that need to be loaded when this module loads
 TypesToProcess = @()

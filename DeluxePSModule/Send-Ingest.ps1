@@ -5,34 +5,34 @@
 		A description of the file.
 #>
 
-function SendPayload([string]$route, [string]$providerInputFormat, [object]$payload)
+function SendPayload([string]$route, [string]$providerInputFormat, [object]$payload, [string]$module)
 {
 	$json = ('{{"ingestURN": "{0}", "providerInputFormat": "{1}", "data":"{2}"}}' -f $name, $providerInputFormat, $encoded)
 	$hdrs = @{ 'Content-Type' = 'application/json' }
 	$progressPreference = 'silentlyContinue'
 	try
 	{
-		Write-Verbose -Message ('MI - Calling {0}' -f $route)
+		Write-Verbose -Message ('MI - {1} Calling {0}' -f $route, $module)
 		$response = Invoke-RestMethod -Uri $route -Method POST -Headers $hdrs -Body $json -ErrorAction Ignore
 		$progressPreference = 'Continue'
 		
 		if ($response.overallStatus -eq 'Failure')
 		{
-			$out = New-Object -TypeName SendResult -ArgumentList $name, $false, ($response.payloadResults | Select-Object -Property failureReason, errorObject)
+			$out = New-Object -TypeName SendResult -ArgumentList $name, $false, ($response.payloadResults | Select-Object -Property failureReason, errorObject), $module
 			Write-Output -InputObject $out
-			Write-Verbose -Message 'MI - Ingest was NOT successful'
+			Write-Verbose -Message ('MI - {0} Ingest was NOT successful' -f $module)
 		}
 		else
 		{
-			Write-Verbose -Message 'MI - Ingest was successful'
-			$out = New-Object -TypeName SendResult -ArgumentList $name, $true, ($response.payloadResults | Select-Object -Property metadataRepositoryURN, atlasURNs, action)
+			Write-Verbose -Message ('MI - {0} Ingest was successful' -f $module)
+			$out = New-Object -TypeName SendResult -ArgumentList $name, $true, ($response.payloadResults | Select-Object -Property metadataRepositoryURN, atlasURNs, action), $module
 			Write-Output -InputObject $out
-			Write-Verbose -Message ('MI - Found {0} results' -f $out.Result.Count)
+			Write-Verbose -Message ('MI - {1} Found {0} results' -f $out.Result.Count, $module)
 		}
 	}
 	catch
 	{
-		Write-Verbose -Message ('MI - Exception calling route {0}' -f $_)
+		Write-Verbose -Message ('MI - {1} Exception calling route {0}' -f $_, $module)
 		$exception = $_.Exception.GetBaseException()
 		if ($null -ne $_.Exception.Response)
 		{
@@ -41,11 +41,11 @@ function SendPayload([string]$route, [string]$providerInputFormat, [object]$payl
 			$reader.BaseStream.Position = 0
 			$reader.DiscardBufferedData()
 			$responseBody = $reader.ReadToEnd()
-			$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception, $responseBody)			
+			$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception, $responseBody), $module
 		}
 		else
 		{
-			$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception)			
+			$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception), $module
 		}
 		Write-Output -InputObject $out
 	}
@@ -84,19 +84,21 @@ function Send-Ingest
 		$encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xml))
 		switch ($ingestType) {
 			'MR' {
-				SendPayload -route $mrRoute -providerInputFormat $providerInputFormat -payload $encoded 
+				SendPayload -route $mrRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'MR   '
 			}
 			'Atlas' {
-				SendPayload -route $atlasRoute -providerInputFormat $providerInputFormat -payload $encoded
+				SendPayload -route $atlasRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'Atlas'
 			}
-			'All' {
-				$mr = SendPayload -route $mrRoute -providerInputFormat $providerInputFormat -payload $encoded
-				$atlas = SendPayload -route $atlasRoute -providerInputFormat $providerInputFormat -payload $encoded
+			'Full' {
+				$mr = SendPayload -route $mrRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'MR   '
+				$atlas = SendPayload -route $atlasRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'Atlas'
+				$mr				
+				$atlas
 			}
 		}
 		
 		$i++
-		$progress = Write-ProgressInner -lastSecond $lastSecond -lastIndex $lastIndex -i $i -perSecond $perSecond -stopwatch $stopWatch
+		$progress = Write-ProgressInner -lastSecond $lastSecond -lastIndex $lastIndex -i $i -perSecond $perSecond -stopwatch $stopWatch -current $name
 		$lastSecond = $progress[0]
 		$lastIndex = $progress[1]
 		$perSecond = $progress[2]

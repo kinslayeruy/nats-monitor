@@ -56,7 +56,8 @@ function Write-ProgressInner
 		[int]$perSecond,
 		[Parameter(Mandatory)]
 		[Diagnostics.Stopwatch]$stopWatch,
-		[switch]$hideProgress
+		[switch]$hideProgress,
+		[string]$current
 	)
 	
 	$newSecond = $stopWatch.Elapsed.Seconds
@@ -67,7 +68,14 @@ function Write-ProgressInner
 	
 	if (-Not $hideProgress)
 	{
-		Write-Progress -Activity 'Sending xmls' -Status ('Processing at {0}/s' -f $perSecond) -PercentComplete -1
+		if ($null -ne $current)
+		{
+			Write-Progress -Activity 'Sending xmls' -Status ('Processing at {0}/s' -f $perSecond) -CurrentOperation ('Sent {0}' -f $current)
+		}
+		else
+		{
+			
+		}
 	}
 	if ($newSecond -gt $lastSecond)
 	{

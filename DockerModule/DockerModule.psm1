@@ -19,10 +19,13 @@ function Build-Containers
 	)
 	Process
 	{
-		if((Get-ChildItem -Filter .mold.yml | Measure-Object).Count -gt 0)
+		if ((Get-ChildItem -Filter .mold.yml | Measure-Object).Count -gt 0)
+		{
+			Write-Verbose ('Running mold for {0}' -f (Split-Path -Path (Get-Location) -Leaf))
+		}
 		Write-Verbose ('Running mold for {0}' -f $Container)
 		Set-Location ('.\{0}' -f $Container)
-		Invoke-Command mold
+		Invoke-Command mold 
 	}
 }
 
