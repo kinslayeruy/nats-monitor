@@ -40,20 +40,11 @@
 		[Parameter(Mandatory)]
 		[string]$template,
 		[string]$hostName = 'localhost:5050',
-		[switch]$showResults,
-		[switch]$compress,
-		[switch]$writeError,
 		[switch]$hideProgress
 	)
 	
 	Begin
 	{
-		$errorFileName = 'errors-Rosetta.log'
-		if ($writeError)
-		{
-			Remove-Item -Path $errorFileName
-		}
-		$dashLine = "`r-------------------------------------------"
 		$i = 0
 		$lastSecond = 0
 		$lastIndex = 0
@@ -82,16 +73,6 @@
 			
 			if (-Not $response.success)
 			{
-				if ($showResults -or $writeError)
-				{
-					Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite $dashLine
-					Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite ('{0} had errors:' -f $name)
-					foreach ($err in $response.errors)
-					{
-						Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite ("`t{0}" -f $err)
-					}
-					Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite ''
-				}
 				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, $response.errors
 				Write-Output -InputObject $out
 				Write-Verbose -Message 'R  - Transformation was NOT successful'
@@ -99,31 +80,9 @@
 			else
 			{
 				Write-Verbose -Message 'R  - Transformation was successful'
-				if ($showResults)
-				{
-					$dashLine
-					$name
-					if ($compress)
-					{
-						$out = ConvertTo-Json -Depth 100 -Compress -InputObject $response.transformResults
-					}
-					else
-					{
-						$out = ConvertTo-Json -Depth 100 -InputObject $response.transformResults
-					}
-					$out
-					''
-				}
-				else
-				{
-					if ($showResults)
-					{
-						Write-Host "`r" -NoNewline
-					}
-					$out = New-Object -TypeName SendResult -ArgumentList $name, $true, ($response.transformResults | ConvertFrom-Json)
-					Write-Output -InputObject $out
-					Write-Verbose -Message ('R  - Found {0} results' -f $out.Result.Count)
-				}
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $true, ($response.transformResults | ConvertFrom-Json)
+				Write-Output -InputObject $out
+				Write-Verbose -Message ('R  - Found {0} results' -f $out.Result.Count)
 			}
 			
 			$i++
@@ -146,20 +105,12 @@
 				$reader.BaseStream.Position = 0
 				$reader.DiscardBufferedData()
 				$responseBody = $reader.ReadToEnd()
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception, $responseBody)
 			}
-			if ($showResults -or $writeError)
+			else
 			{
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite $dashLine
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite ('{0} had exception:' -f $name)
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite $exception.Message
-				if ($null -ne $responseBody)
-				{
-					Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite 'Response Message:'
-					Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite $responseBody
-				}
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorFileName -ErrorToWrite ''
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception)
 			}
-			$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception)
 			Write-Output -InputObject $out
 		}
 	}

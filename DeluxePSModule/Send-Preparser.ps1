@@ -18,16 +18,7 @@
 	
 	.PARAMETER inFormat
 		The preparser input format. can be a value between 'GPMS', 'Alpha' or 'DBB'.
-	
-	.PARAMETER showResults
-		Shows the result in the host, instead of returning the results as objects.
-	
-	.PARAMETER compress
-		Compresses the results shown, won't be taken into account if showResults is not present.
-	
-	.PARAMETER writeError
-		Writes errors to an error log file instead of the host.
-	
+		
 	.PARAMETER hideProgress
 		Hides progress bars.
 	
@@ -47,20 +38,10 @@
 		[ValidateSet('SonyGPMS', 'SonyAlpha', 'SonyDBB')]
 		[Parameter(Mandatory)]
 		[string]$inFormat,
-		[switch]$showResults,
-		[switch]$compress,
-		[switch]$writeError,
 		[switch]$hideProgress
 	)
 	Begin
 	{
-		$dashLine = "`r-------------------------------------------"
-		$errorLogName = 'rosetta-errors.log'
-		
-		if ($writeError)
-		{
-			Remove-Item -Path $errorLogName
-		}
 		switch ($outFormat)
 		{
 			'MR'    {
@@ -70,7 +51,7 @@
 			'Atlas' {
 				$route = ('http://{0}/v1/preparse/oneingest-titleToAtlas-transform' -f $hostName)
 				break
-			}			
+			}
 		}
 		switch ($inFormat)
 		{
@@ -117,19 +98,6 @@
 			
 			if (-Not $response.succeeded)
 			{
-				if ($showResults -or $writeError)
-				{
-					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $dashLine
-					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ('{0} had errors:' -f $name)
-					foreach ($res in $response.results)
-					{
-						foreach ($err in $res.errors)
-						{
-							Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ("`t{0}" -f $err)
-						}
-					}
-					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ''
-				}
 				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, ($response.results | Select-Object -ExpandProperty errors)
 				Write-Output -InputObject $out
 				Write-Verbose -Message 'PP - Transformation was NOT successful'
@@ -137,35 +105,16 @@
 			else
 			{
 				Write-Verbose -Message 'PP - Transformation was successful'
-				if ($showResults)
+				if ($inFormat -eq 'SonyDBB')
 				{
-					$dashLine
-					$name
-					foreach ($res in $response.results)
-					{
-						if ($compress) { $out = ConvertFrom-Json -InputObject $res.transformation | ConvertTo-Json -Depth 100 -Compress }
-						else { $out = $out = ConvertFrom-Json -InputObject $res.transformation | ConvertTo-Json -Depth 100 }
-						$out
-					}
-					''
+					$out = New-Object -TypeName SendResult -ArgumentList $name, $true, @(($response.document | ConvertFrom-Json))
 				}
 				else
 				{
-					if ($showResults)
-					{
-						Write-Host "`r" -NoNewline
-					}
-					if ($inFormat -eq 'SonyDBB')
-					{
-						$out = New-Object -TypeName SendResult -ArgumentList $name, $true, @(($response.document | ConvertFrom-Json))
-					}
-					else
-					{
-						$out = New-Object -TypeName SendResult -ArgumentList $name, $true, ($response.results | Select-Object -ExpandProperty transformation | ConvertFrom-Json)
-					}
-					Write-Output -InputObject $out
-					Write-Verbose -Message ('PP - Found {0} results' -f $out.Result.Count)
+					$out = New-Object -TypeName SendResult -ArgumentList $name, $true, ($response.results | Select-Object -ExpandProperty transformation | ConvertFrom-Json)
 				}
+				Write-Output -InputObject $out
+				Write-Verbose -Message ('PP - Found {0} results' -f $out.Result.Count)
 			}
 			
 			$i++
@@ -189,20 +138,12 @@
 				$reader.BaseStream.Position = 0
 				$reader.DiscardBufferedData()
 				$responseBody = $reader.ReadToEnd()
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception, $responseBody)
 			}
-			if ($showResults -or $writeError)
+			else
 			{
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $dashLine
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ('{0} had exception:' -f $name)
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $exception.Message
-				if ($null -ne $responseBody)
-				{
-					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite 'Response Message:'
-					Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite $responseBody
-				}
-				Write-ErrorInner -ToFile $writeError -OutputFile $errorLogName -ErrorToWrite ''
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception)
 			}
-			$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception)
 			Write-Output -InputObject $out
 		}
 	}

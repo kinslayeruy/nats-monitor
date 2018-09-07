@@ -68,7 +68,7 @@ FormatsToProcess = @()
 NestedModules = @()
 
 # List of exportable functions
-FunctionsToExport = @('Compare-RvP', 'Send-Rosetta', 'Send-Preparser')
+FunctionsToExport = @('Compare-RvP', 'Send-Rosetta', 'Send-Preparser', 'Send-Ingest')
 
 # List of exportable cmdlets
 CmdletsToExport = '*'
