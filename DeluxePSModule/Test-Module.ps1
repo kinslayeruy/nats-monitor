@@ -16,7 +16,7 @@ $Ignore = @(
 
 #Get-ChildItem *.xml | Select-Object -Skip 300 | Compare-RvP -CompareType SonyAlpha-Atlas -ignore $Ignore | ForEach-Object { $_.WriteOut() }
 
-Get-ChildItem *.xml | Select-Object -First 10 | Send-Ingest -Verbose -hostName 'metadata-ingest.service.owf-dev' -ingestType Atlas -providerInputFormat SonyGPMS | ForEach-Object { $_.WriteOut() }
+#Get-ChildItem *.xml | Select-Object -First 10 | Send-Ingest -Verbose -hostName 'metadata-ingest.service.owf-dev' -ingestType Atlas -providerInputFormat SonyGPMS | ForEach-Object { $_.WriteOut() }
 
 #$toTest = 'Sony_DBB_Asset_Input.xml'
 #Get-Content $toTest

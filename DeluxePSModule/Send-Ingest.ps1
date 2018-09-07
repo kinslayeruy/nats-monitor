@@ -53,6 +53,7 @@ function SendPayload([string]$route, [string]$providerInputFormat, [object]$payl
 
 function Send-Ingest
 {
+	[OutputType([SendResult])]
 	Param (
 		[Parameter(Mandatory, ValueFromPipeline)]
 		[string]$file,

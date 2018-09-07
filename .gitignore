@@ -7,4 +7,11 @@ packages/
 *.user
 /.vs/*
 DeluxePSModule/Staging/
+DockerModule/Staging/
 *.TempPoint.*
+*.Export.*
+*.psprojs
+*.RestorePoint.*
+*.Run.ps1
+*.Package.ps1
+CustomMenu.inf
