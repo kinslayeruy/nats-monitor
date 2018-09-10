@@ -15,8 +15,8 @@
 
 @{
 	
-	# Script module or binary module file associated with this manifest
-	ModuleToProcess = 'DockerModule.psm1'
+	# Module Loader File
+	RootModule = 'DockerModule.psm1'
 	
 	# Version number of this module.
 	ModuleVersion = '1.0.0.0'
@@ -37,7 +37,7 @@
 	Description = 'Module description'
 	
 	# Minimum version of the Windows PowerShell engine required by this module
-	PowerShellVersion = '2.0'
+	PowerShellVersion = '3.0'
 	
 	# Name of the Windows PowerShell host required by this module
 	PowerShellHostName = ''
@@ -76,7 +76,7 @@
 	NestedModules = @()
 	
 	# Functions to export from this module
-	FunctionsToExport = @()
+	FunctionsToExport = @('ConvertFrom-Docker', 'Update-Container', 'Start-Container')
 	
 	# Cmdlets to export from this module
 	CmdletsToExport = @()

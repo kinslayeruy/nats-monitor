@@ -26,7 +26,7 @@
 Import-Module 'DockerModule'
 
 #Run each module function
-Write-HelloWorld
+docker images | Convertfrom-Docker | Select-Object ImageId, Repository, Tag | Format-Table -AutoSize
 
 #Sample Pester Test
 #Describe "Test DockerModule" {

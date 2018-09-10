@@ -15,3 +15,4 @@ DockerModule/Staging/
 *.Run.ps1
 *.Package.ps1
 CustomMenu.inf
+*.psbuild

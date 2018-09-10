@@ -1,0 +1,140 @@
+version: '3.5'
+#all services
+networks:
+    deluxe:
+        driver: bridge
+        name: deluxe
+
+services:
+    elasticsearch:
+        hostname: elasticsearch
+        container_name: elasticsearch
+        image: elasticsearch:5.6-alpine
+        networks:
+            - deluxe
+        ports:
+            - "19200:9200"
+            - "19300:9300"
+    
+    nats:
+        hostname: nats-streaming-server
+        container_name: nats-streaming-server
+        image: nats-streaming
+        command: -p 4222 -m 8223 -cluster_id events-streaming
+        networks:
+            - deluxe
+        ports:
+            - "4222:4222"
+    
+    rosetta:
+        depends_on:
+            - elasticsearch
+            - nats
+        hostname: rosetta
+        container_name: rosetta
+        image: rosetta:api
+        networks:
+            - deluxe
+        ports:
+            - "5050:80"
+        environment:
+            event_hostname: nats://nats:4222
+            db_host: elasticsearch
+            db_uri: http://elasticsearch:9200
+            db_init_wait_secs: 60
+            db_init_pause_secs: 3        
+
+    metadata-repository:
+        depends_on:
+            - elasticsearch
+            - nats
+        hostname: metadata-repository
+        container_name: metadata-repository
+        image: metadata-repository:api
+        networks:
+            - deluxe
+        ports:
+            - "5030:80"
+        environment:
+            APP_VERSION: 0.0.1
+            EVENT_HOST: nats-streaming-server
+            db_host: elasticsearch
+            db_init_wait_secs: 240
+            db_init_pause_secs: 10
+            DISABLE_NATS_MESSAGES: "false"
+                
+    transformer:
+        depends_on:
+            - elasticsearch
+            - nats
+        hostname: transformer
+        container_name: transformer
+        image: transformer:api
+        networks:
+            - deluxe
+        ports:
+            - "5010:5000"
+        environment:
+            db_host: elasticsearch
+            db_init_wait_secs: 120
+            db_init_pause_secs: 10
+            app_version: 0.0.1
+            disable_nats_messages: "false"
+            auth_enabled: "false"
+            event_host_name: nats-streaming-server
+            event_cluster_name: events-streaming
+
+    transform-preparser:
+        depends_on:
+            - elasticsearch
+            - nats
+            - transformer
+        hostname: transform-preparser
+        container_name: transform-preparser
+        image: transform-preparser:latest
+        networks:
+            - deluxe
+        ports:
+            - "5020:80"        
+        environment:
+            DISABLE_NATS_MESSAGES: "false"
+            EVENT_HOST: nats-streaming-server
+            event_cluster_name: events-streaming
+            APP_VERSION: 0.0.1
+            transformer_addr: transformer
+            sony_asset_to_atlas_video_component_transform_id: sony.asset.xml-to-json.d3.atlas.asset.video
+            sony_asset_to_atlas_audio_component_transform_id: sony.asset.xml-to-json.d3.atlas.asset.audio
+            sony_asset_to_atlas_subtitle_component_transform_id: sony.asset.xml-to-json.d3.atlas.asset.subs
+            sony_asset_to_atlas_root_component_transform_id: sony.asset.xml-to-json.d3.atlas.asset.root
+            sony_asset_to_atlas_image_component_transform_id: sony.asset.xml-to-json.d3.atlas.asset.image
+            sony_title_to_atlas_feature_transform_id: sony.feature.xml-to-json.d3.atlas.title
+            sony_title_to_atlas_episode_transform_id: sony.episode.xml-to-json.d3.atlas.title
+            sony_title_to_atlas_season_transform_id: sony.season.xml-to-json.d3.atlas.title
+            sony_title_to_atlas_series_transform_id: sony.series.xml-to-json.d3.atlas.title
+            sony_title_to_mr_feature_transform_id: sony.feature.xml-to-json.d3.mr.title
+            sony_title_to_mr_episode_transform_id: sony.episodic.xml-to-json.d3.mr.title
+            sony_alpha_to_atlas_transform_id: sony.alpha.xml-to-json.d3.atlas.title
+            sony_alpha_to_mr_transform_id: sony.alpha.xml-to-json.d3.mr.title
+        
+        
+    #metadata-ingest:
+    #    hostname: metadata-ingest
+    #    container_name: metadata-ingest
+    #    image: metadata-ingest:api
+    #    networks:
+    #        - deluxe
+    #    ports:
+    #        - "6000:80"
+    #    environment:
+    #        APP_VERSION: 0.0.1
+    #        EVENT_HOST: nats://nats-streaming-server:4222
+    #        PREPARSER_HOST: http://transform-preparser:5000
+    #        ROSETTA_HOST: http://rosetta
+    #        METADATAREPO_HOST: metadata-repository
+    #        ATLAS_HOST: http://atlas
+    #        AUTH_HOST: auth.service.owf-dev
+    #        AUTH_TENANT: deluxe
+    #        VAULT_TOKEN: c2d1b88d-a8a3-a0b5-74c4-3bedcc9e3086
+    #        VAULT_HOST: vault.service.owf-dev
+    #        VAULT_BASE: v1/secret/metadata-ingest
+    #        use_service_discovery: "True"
