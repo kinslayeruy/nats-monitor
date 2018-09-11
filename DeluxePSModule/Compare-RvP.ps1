@@ -227,6 +227,11 @@ function Compare-RvP
 		}
 		else
 		{
+			if ($null -eq $ignore)
+			{
+				$ignore = @()
+			}
+			$ignore+= '.Module'
 			Compare-ObjectDeep -Name $Name -Base $preparser -Compare $rosetta -Ignore $ignore
 		}
 		$i++
