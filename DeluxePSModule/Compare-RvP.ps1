@@ -1,5 +1,6 @@
 ﻿function script:GetObjectValue
 {
+	[OutputType([string])]
 	Param (
 		[string]$Path = '',
 		[object]$CurrentObject = $null
@@ -43,8 +44,13 @@ function script:Sort-ByPath
 			$sorted = @()
 			foreach ($item in $InputObject)
 			{
+				$value = GetObjectValue -Path $Path -CurrentObject $item
+				if ($null -eq $value)
+				{
+					$value = ''
+				}
 				$sort = [pscustomobject] @{
-					SortBy = GetObjectValue -Path $Path -CurrentObject $item
+					SortBy = $value.ToString()
 					Value  = $item
 				}
 				$sorted += $sort

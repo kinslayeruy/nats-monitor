@@ -117,24 +117,24 @@ services:
             sony_alpha_to_mr_transform_id: sony.alpha.xml-to-json.d3.mr.title
         
         
-    #metadata-ingest:
-    #    hostname: metadata-ingest
-    #    container_name: metadata-ingest
-    #    image: metadata-ingest:api
-    #    networks:
-    #        - deluxe
-    #    ports:
-    #        - "6000:80"
-    #    environment:
-    #        APP_VERSION: 0.0.1
-    #        EVENT_HOST: nats://nats-streaming-server:4222
-    #        PREPARSER_HOST: http://transform-preparser:5000
-    #        ROSETTA_HOST: http://rosetta
-    #        METADATAREPO_HOST: metadata-repository
-    #        ATLAS_HOST: http://atlas
-    #        AUTH_HOST: auth.service.owf-dev
-    #        AUTH_TENANT: deluxe
-    #        VAULT_TOKEN: c2d1b88d-a8a3-a0b5-74c4-3bedcc9e3086
-    #        VAULT_HOST: vault.service.owf-dev
-    #        VAULT_BASE: v1/secret/metadata-ingest
-    #        use_service_discovery: "True"
+    metadata-ingest:
+        hostname: metadata-ingest
+        container_name: metadata-ingest
+        image: metadata-ingest:api
+        networks:
+            - deluxe
+        ports:
+            - "6000:80"
+        environment:
+            APP_VERSION: 0.0.1
+            EVENT_HOST: nats://nats-streaming-server:4222
+            PREPARSER_HOST: http://transform-preparser:5000
+            ROSETTA_HOST: http://rosetta
+            METADATAREPO_HOST: metadata-repository
+            ATLAS_HOST: http://atlas
+            AUTH_HOST: auth.service.owf-dev
+            AUTH_TENANT: deluxe
+            VAULT_TOKEN: c2d1b88d-a8a3-a0b5-74c4-3bedcc9e3086
+            VAULT_HOST: vault.service.owf-dev
+            VAULT_BASE: v1/secret/metadata-ingest
+            use_service_discovery: "True"
