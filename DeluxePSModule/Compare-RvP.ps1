@@ -227,12 +227,20 @@ function Compare-RvP
 		}
 		else
 		{
-			if ($null -eq $ignore)
+			if ($rosetta.Success -and $preparser.Success)
 			{
-				$ignore = @()
+				
+				if ($null -eq $ignore)
+				{
+					$ignore = @()
+				}
+				$ignore += '.Module'
+				Compare-ObjectDeep -Name $Name -Base $preparser -Compare $rosetta -Ignore $ignore
 			}
-			$ignore+= '.Module'
-			Compare-ObjectDeep -Name $Name -Base $preparser -Compare $rosetta -Ignore $ignore
+			else
+			{				
+				Write-Output -InputObject (New-Object -TypeName CompareError -ArgumentList $Name, '.Success', ('One or both of the calls were unsuccessful ({0} != {1})' -f $preparser.Success, $rosetta.Success))
+			}
 		}
 		$i++
 		Write-Progress -Activity 'Comparing Files' -Status ('{0} files processed' -f $i) -PercentComplete -1
