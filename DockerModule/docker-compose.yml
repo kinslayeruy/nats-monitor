@@ -138,3 +138,19 @@ services:
             VAULT_HOST: vault.service.owf-dev
             VAULT_BASE: v1/secret/metadata-ingest
             use_service_discovery: "True"
+
+    atlas:
+        depends_on:
+            - elasticsearch
+            - nats
+        hostname: atlas
+        container_name: atlas
+        image: atlas:latest
+        networks:
+            - deluxe
+        ports:
+            - "5060:5000"
+        environment:
+            auth_enabled: "False"
+            nats_host: nats-streaming-server
+            db_host: elasticsearch

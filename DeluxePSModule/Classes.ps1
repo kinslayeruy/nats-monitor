@@ -86,9 +86,13 @@ class SendResult
 			{
 				Write-Host "`t$item"
 			}
+			elseif ($this.Success)
+			{
+				Write-Host "`t$(ConvertTo-Json -InputObject $item -Depth 10 -Compress)"
+			}
 			else
 			{
-				Write-Host "`t$(ConvertTo-Json -InputObject $item -Depth 100 -Compress)"				
+				Write-Host "`t$(ConvertTo-Json -InputObject $item -Depth 1 -Compress)"
 			}
 		}
 		Write-Host ' '

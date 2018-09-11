@@ -5,8 +5,11 @@
 		A description of the file.
 #>
 
+
 function SendPayload([string]$route, [string]$providerInputFormat, [object]$payload, [string]$module)
 {
+	[OutputType([SendResult])]
+	
 	$json = ('{{"ingestURN": "{0}", "providerInputFormat": "{1}", "data":"{2}"}}' -f $name, $providerInputFormat, $encoded)
 	$hdrs = @{ 'Content-Type' = 'application/json' }
 	$progressPreference = 'silentlyContinue'
@@ -47,7 +50,7 @@ function SendPayload([string]$route, [string]$providerInputFormat, [object]$payl
 		{
 			$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception), $module
 		}
-		Write-Output -InputObject $out
+		return $out
 	}
 }
 
@@ -90,10 +93,10 @@ function Send-Ingest
 				SendPayload -route $atlasRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'Atlas'
 			}
 			'Full' {
-				$mr = SendPayload -route $mrRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'MR   '
-				$atlas = SendPayload -route $atlasRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'Atlas'
-				$mr				
-				$atlas
+				[SendResult]$mr = SendPayload -route $mrRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'MR   '
+				[SendResult]$atlas = SendPayload -route $atlasRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'Atlas'
+				Write-Output $mr
+				Write-Output $atlas
 			}
 		}
 		
