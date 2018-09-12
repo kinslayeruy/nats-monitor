@@ -4,3 +4,9 @@ copy /V /Y DeluxePSModule\*.* %USERPROFILE%\Documents\WindowsPowerShell\Modules\
 
 mkdir %USERPROFILE%\Documents\WindowsPowerShell\Modules\DockerModule
 copy /V /Y DockerModule\*.* %USERPROFILE%\Documents\WindowsPowerShell\Modules\DockerModule
+
+Remove-Module Deluxe
+Remove-Module DockerModule
+
+Import-Module Deluxe
+Import-Module DockerModule
