@@ -7,7 +7,7 @@
 #>
 
 Import-Module Deluxe
-Set-Location -Path 'c:\TestData\LoadTests'
+Set-Location -Path 'c:\TestData\SonyGPMS'
 $Ignore = @(
 		'.Result[*].record.metadata.countryOfOrigin'
 	# , '.Result[*].record.metadata.originalLanguage'
@@ -16,8 +16,8 @@ $Ignore = @(
 	, '.Result[*].feature.studios'
 )
 #Get-ChildItem *.xml | Select-Object -first 100 | Send-Ingest -ingestType Full -providerInputFormat SonyGPMS -hostName metadata-ingest.service.owf-dev | ForEach-Object { $_.WriteOut() }
-#Get-ChildItem *.xml | Select-Object -Skip 300 | Compare-RvP -CompareType SonyAlpha-Atlas -ignore $Ignore | ForEach-Object { $_.WriteOut() }
-ls *.xml | Select-Object -first 1 | Send-Ingest -ingestType Full -hostName metadata-ingest.service.owf-dev -providerInputFormat SonyGPMS -Verbose | ForEach-Object { $_.WriteOut() }
+Get-ChildItem *.xml -Recurse | Select-Object -Skip 300 | Compare-RvP -CompareType SonyGPMS-MR -ignore $Ignore | ForEach-Object { $_.WriteOut() }
+#Get-ChildItem *.xml -Recurse | Send-Ingest -ingestType Full -hostName localhost:5003 -providerInputFormat SonyGPMS -force | ForEach-Object { $_.WriteOutWithActionHightlight() }
 #Get-ChildItem *.xml | Select-Object -First 10 | Send-Ingest -Verbose -hostName 'metadata-ingest.service.owf-dev' -ingestType Atlas -providerInputFormat SonyGPMS | ForEach-Object { $_.WriteOut() }
 
 #$toTest = 'Sony_DBB_Asset_Input.xml'

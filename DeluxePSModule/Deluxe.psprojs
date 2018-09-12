@@ -3,8 +3,10 @@
   <FileID>88586b59-6ebb-4573-83de-af621c31d0d8</FileID>
   <OpenFolders />
   <OpenFiles>
-    <File>Compare-RvP.ps1</File>
     <File>Test-Module.ps1</File>
+    <File>Send-Ingest.ps1</File>
+    <File>Classes.ps1</File>
+    <File>Send-Preparser.ps1</File>
     <File>Compare.ps1</File>
   </OpenFiles>
 </ProjectState>

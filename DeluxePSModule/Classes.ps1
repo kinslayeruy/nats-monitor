@@ -76,7 +76,45 @@ class SendResult
 		}
 	}
 	
-	#Methods	
+	#Methods
+	WriteOutWithActionHightlight()
+	{
+		$this.WriteStatus()
+		foreach ($item in $this.Result)
+		{
+			if ($item -is [string])
+			{
+				Write-Host "`t$item"
+			}
+			elseif ($this.Success)
+			{
+				switch ($item.action) {
+					'Created' {
+						Write-Host -NoNewline -ForegroundColor Green $item.action
+					}
+					'Updated' {
+						Write-Host -NoNewline -ForegroundColor DarkGreen $item.action
+					}
+					'Skipped' {
+						Write-Host -NoNewline -ForegroundColor Yellow $item.action
+					}
+					'None' {
+						Write-Host -NoNewline -ForegroundColor Red $item.action
+					}
+					default {
+						Write-Host -NoNewline -ForegroundColor Cyan $item.action
+					}
+				}				
+				Write-Host "`t$(ConvertTo-Json -InputObject $item -Depth 10 -Compress)"
+			}
+			else
+			{
+				Write-Host "`t$(ConvertTo-Json -InputObject $item -Depth 1 -Compress)"
+			}
+		}
+		Write-Host ' '
+	}
+	
 	WriteOut()
 	{
 		$this.WriteStatus()

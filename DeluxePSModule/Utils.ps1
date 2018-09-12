@@ -70,7 +70,7 @@ function Write-ProgressInner
 	{
 		if ($null -ne $current)
 		{
-			Write-Progress -Activity 'Sending xmls' -Status ('Processing at {0}/s' -f $perSecond) -CurrentOperation ('Sent {0}' -f $current)
+			Write-Progress -Activity 'Sending xmls' -Status ('Processing at {0}/s ({1} sent total)' -f $perSecond, $i) -CurrentOperation ('Sent {0}' -f $current)
 		}
 		else
 		{

@@ -6,11 +6,11 @@
 #>
 
 
-function SendPayload([string]$route, [string]$providerInputFormat, [object]$payload, [string]$module)
+function SendPayload([string]$route, [string]$providerInputFormat, [object]$payload, [string]$module, [string]$name)
 {
 	[OutputType([SendResult])]
 	
-	$json = ('{{"ingestURN": "{0}", "providerInputFormat": "{1}", "data":"{2}"}}' -f $name, $providerInputFormat, $encoded)
+	$json = ('{{"ingestURN": "{0}", "providerInputFormat": "{1}", "data":"{2}"}}' -f $name, $providerInputFormat, $payload)
 	$hdrs = @{ 'Content-Type' = 'application/json' }
 	$progressPreference = 'silentlyContinue'
 	try
@@ -54,6 +54,51 @@ function SendPayload([string]$route, [string]$providerInputFormat, [object]$payl
 	}
 }
 
+function Link([string]$route, [string]$name, [SendResult]$mr, [SendResult]$atlas)
+{
+	#[OutputType([SendResult])]
+	
+	foreach ($mrResult in $mr.Result) {
+		$json = ('{{"ingestURN": "{0}", "metadataRepositoryId": "{1}", "atlasIds":{2}}}' -f $name, $mrResult.metadataRepositoryURN, ($atlas.Result[0].atlasURNs | ConvertTo-Json -Depth 2))
+		$hdrs = @{ 'Content-Type' = 'application/json' }
+		$progressPreference = 'silentlyContinue'
+		try
+		{
+			Write-Verbose -Message ('MI - Link  Calling {0}' -f $route)
+			$response = Invoke-WebRequest -Uri $route -Method POST -Headers $hdrs -Body $json -ErrorAction Ignore
+			$progressPreference = 'Continue'
+			if ($response.StatusCode -eq 200)
+			{
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $true, @(), 'Link '
+			}
+			else
+			{
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @(), 'Link '
+			}
+			return $out
+		}
+		catch
+		{
+			Write-Verbose -Message ('MI - Link  Exception calling route {0}' -f $_)
+			$exception = $_.Exception.GetBaseException()
+			if ($null -ne $_.Exception.Response)
+			{
+				$result = $_.Exception.Response.GetResponseStream()
+				$reader = New-Object -TypeName IO.StreamReader -ArgumentList ($result)
+				$reader.BaseStream.Position = 0
+				$reader.DiscardBufferedData()
+				$responseBody = $reader.ReadToEnd()
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception, $responseBody), 'Link '
+			}
+			else
+			{
+				$out = New-Object -TypeName SendResult -ArgumentList $name, $false, @($exception), 'Link '
+			}
+			return $out
+		}
+	}	
+}
+
 function Send-Ingest
 {
 	[OutputType([SendResult])]
@@ -66,12 +111,18 @@ function Send-Ingest
 		[string]$ingestType,
 		[ValidateSet('SonyGPMS', 'SonyAlpha')]
 		[Parameter(Mandatory)]
-		[string]$providerInputFormat
+		[string]$providerInputFormat,
+		[switch]$force
 	)
 	Begin
 	{
-		$mrRoute = ('http://{0}/v1/ingest/metadata' -f $hostName)
-		$atlasRoute = ('http://{0}/v1/ingest/atlas' -f $hostName)
+		$mrRoute = ('http://{0}/v1/ingest/metadata?Verbosity=HideBoth' -f $hostName)
+		$atlasRoute = ('http://{0}/v1/ingest/atlas?Verbosity=HideBoth' -f $hostName)
+		if ($force)
+		{
+			$mrRoute += '&force=true'
+			$atlasRoute += '&force=true'
+		}
 		$linkRoute = ('http://{0}/v1/ingest/link' -f $hostName)
 		$i = 0
 		$lastSecond = 0
@@ -87,16 +138,22 @@ function Send-Ingest
 		$encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xml))
 		switch ($ingestType) {
 			'MR' {
-				SendPayload -route $mrRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'MR   '
+				SendPayload -route $mrRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'MR   ' -name $name
 			}
 			'Atlas' {
-				SendPayload -route $atlasRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'Atlas'
+				SendPayload -route $atlasRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'Atlas' -name $name
 			}
 			'Full' {
-				[SendResult]$mr = SendPayload -route $mrRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'MR   '
-				[SendResult]$atlas = SendPayload -route $atlasRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'Atlas'
+				[SendResult]$mr = SendPayload -route $mrRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'MR   ' -name $name
+				[SendResult]$atlas = SendPayload -route $atlasRoute -providerInputFormat $providerInputFormat -payload $encoded -module 'Atlas' -name $name
+				
 				Write-Output $mr
 				Write-Output $atlas
+				if ($mr.Success -and $atlas.Success)
+				{
+					[SendResult]$link = Link -route $linkRoute -name $name -mr $mr -atlas $atlas
+					Write-Output $link
+				}
 			}
 		}
 		
