@@ -5,8 +5,8 @@
   <OpenFiles>
     <File>Test-Module.ps1</File>
     <File>Send-Ingest.ps1</File>
+    <File>Utils.ps1</File>
     <File>Classes.ps1</File>
-    <File>Send-Preparser.ps1</File>
-    <File>Compare.ps1</File>
+    <File>Compare-RvP.ps1</File>
   </OpenFiles>
 </ProjectState>

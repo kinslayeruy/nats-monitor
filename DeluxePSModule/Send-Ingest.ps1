@@ -21,7 +21,22 @@ function SendPayload([string]$route, [string]$providerInputFormat, [object]$payl
 		
 		if ($response.overallStatus -eq 'Failure')
 		{
-			$out = New-Object -TypeName SendResult -ArgumentList $name, $false, ($response.payloadResults | Select-Object -Property failureReason, errorObject), $module
+			$errors = New-Object System.Collections.ArrayList
+			
+			foreach ($payload in $response.payloadResults) {
+				$echo = $errors.Add($payload.failureReason)
+				$errorMessages = @($payload.transformationDetails | Select-Object -expand errors)
+				if ($null -ne $errorMessages)
+				{
+					$errors.AddRange($errorMessages)
+				}
+				$errorObjects = $payload.errorObject | Select-Object result | ConvertTo-Json -Depth 3 -Compress
+				if ($null -ne $errorObjects)
+				{
+					$echo = $errors.Add($errorObjects)
+				}				
+			}
+			$out = New-Object -TypeName SendResult -ArgumentList $name, $false, $errors, $module
 			Write-Output -InputObject $out
 			Write-Verbose -Message ('MI - {0} Ingest was NOT successful' -f $module)
 		}
@@ -109,7 +124,7 @@ function Send-Ingest
 		[ValidateSet('MR', 'Atlas', 'Full')]
 		[Parameter(Mandatory)]
 		[string]$ingestType,
-		[ValidateSet('SonyGPMS', 'SonyAlpha')]
+		[ValidateSet('SonyGPMS', 'SonyAlpha', 'CanonicalMetadata')]
 		[Parameter(Mandatory)]
 		[string]$providerInputFormat,
 		[switch]$force
