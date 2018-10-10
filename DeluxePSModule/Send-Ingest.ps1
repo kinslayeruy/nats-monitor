@@ -124,7 +124,7 @@ function Send-Ingest
 		[ValidateSet('MR', 'Atlas', 'Full')]
 		[Parameter(Mandatory)]
 		[string]$ingestType,
-		[ValidateSet('SonyGPMS', 'SonyAlpha', 'CanonicalMetadata')]
+		[ValidateSet('SonyGPMS', 'SonyAlpha', 'CanonicalMetadata', 'RedBeeMediaLGI', 'CharterADI', 'DodAsset')]
 		[Parameter(Mandatory)]
 		[string]$providerInputFormat,
 		[switch]$force

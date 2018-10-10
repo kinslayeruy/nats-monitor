@@ -37,14 +37,119 @@
 	Param (
 		[Parameter(Mandatory, ValueFromPipeline)]
 		[string]$file,
-		[Parameter(Mandatory)]
 		[string]$template,
+		[ValidateSet(
+				  'SonyGPMSToDCMeToMR'
+			    , 'SonyGPMSToDCMeToAtlas'
+			    , 'SonyGPMSToDCMe'
+			
+			    , 'SonyAlphaToDCMeToMR'
+			    , 'SonyAlphaToDCMeToAtlas'
+			    , 'SonyAlphaToDCMe'
+			
+			    , 'SonyDBBToDCMaToAtlas'
+			    , 'SonyDBBToDCMa'
+			
+				, 'CanonicalMetadataToDCMeToMR'
+			    , 'CanonicalMetadataToDCMeToAtlas'
+			    , 'CanonicalMetadataToDCMe'
+			   
+			    , 'CanonicalManifestToDCMaToAtlas'
+			    , 'CanonicalManifestToDCMa'
+			
+			    , 'RedBeeMediaLGIToDCMeToMR'
+			    , 'RedBeeMediaLGIToDCMe'
+			
+			    , 'RedBeeMediaLGIToDCMaToAtlas'
+			    , 'RedBeeMediaLGIToDCMa'
+			   
+			    , 'ADIToDCMeToMR'
+			    , 'ADIToDCMeToAtlas'
+			    , 'ADIToDCMe'
+			
+			    , 'ADIToDCMaToAtlas'
+			    , 'ADIToDCMa')]		
+		[string]$flow,
 		[string]$hostName = 'localhost:5050',
 		[switch]$hideProgress
 	)
 	
 	Begin
 	{
+		if (($null -eq $template) -or ('' -eq $template))
+		{
+			switch ($flow) {
+				'SonyGPMSToDCMeToMR' {
+					$template = 'json.sony.gpms.canonical-metadata,json.canonical-metadata.mr'
+				}
+				'SonyGPMSToDCMeToAtlas' {
+					$template = 'json.sony.gpms.canonical-metadata,json.canonical-metadata.atlas'
+				}
+				'SonyGPMSToDCMe' {
+					$template = 'json.sony.gpms.canonical-metadata'
+				}
+				'SonyAlphaToDCMeToMR' {
+					$template = 'json.sony.alpha.canonical-metadata,json.canonical-metadata.mr'
+				}
+				'SonyAlphaToDCMeToAtlas' {
+					$template = 'json.sony.alpha.canonical-metadata,json.canonical-metadata.atlas'
+				}
+				'SonyAlphaToDCMe' {
+					$template = 'json.sony.alpha.canonical-metadata'
+				}
+				'SonyDBBToDCMaToAtlas' {
+					$template = 'json.sony.dbb.canonical-manifest,json.canonical-manifest.atlas'
+				}
+				'SonyDBBToDCMa' {
+					$template = 'json.sony.dbb.canonical-manifest'
+				}
+				'CanonicalMetadataToDCMeToMR' {
+					$template = 'json.canonical-metadata.canonical-metadata,json.canonical-metadata.mr'
+				}
+				'CanonicalMetadataToDCMeToAtlas' {
+					$template = 'json.canonical-metadata.canonical-metadata,json.canonical-metadata.atlas'
+				}
+				'CanonicalMetadataToDCMe' {
+					$template = 'json.canonical-metadata.canonical-metadata'
+				}
+				'CanonicalManifestToDCMaToAtlas' {
+					$template = 'json.canonical-manifest.canonical-manifest,json.canonical-manifest.atlas'
+				}
+				'CanonicalManifestToDCMa' {
+					$template = 'json.canonical-manifest.canonical-manifest'
+				}
+				'RedBeeMediaLGIToDCMeToMR' {
+					$template = 'json.red-bee-media.canonical-metadata,json.canonical-metadata.mr'
+				}
+				'RedBeeMediaLGIToDCMe' {
+					$template = 'json.red-bee-media.canonical-metadata'
+				}
+				'RedBeeMediaLGIToDCMaToAtlas' {
+					$template = 'json.red-bee-media.canonical-manifest,json.canonical-manifest.atlas'
+				}
+				'RedBeeMediaLGIToDCMa' {
+					$template = 'json.red-bee-media.canonical-manifest'
+				}
+				'ADIToDCMeToMR' {
+					$template = 'json.adi.canonical-metadata,json.canonical-metadata.mr'
+				}
+				'ADIToDCMeToAtlas' {
+					$template = 'json.adi.canonical-metadata,json.canonical-metadata.atlas'
+				}
+				'ADIToDCMe' {
+					$template = 'json.adi.canonical-metadata'
+				}
+				'ADIToDCMaToAtlas' {
+					$template = 'json.adi.canonical-manifest,json.canonical-manifest.atlas'
+				}
+				'ADIToDCMa' {
+					$template = 'json.adi.canonical-manifest'
+				}				
+				default {
+					throw New-Object -TypeName System.Exception -ArgumentList 'no template'
+				}
+			}
+		}
 		$i = 0
 		$lastSecond = 0
 		$lastIndex = 0
