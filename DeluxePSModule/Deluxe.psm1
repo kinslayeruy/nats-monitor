@@ -5,3 +5,4 @@
 . $PSScriptRoot\Send-Rosetta.ps1
 . $PSScriptRoot\Compare-RvP.ps1
 . $PSScriptRoot\Send-Ingest.ps1
+. $PSScriptRoot\Get-Versions.ps1

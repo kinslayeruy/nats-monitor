@@ -48,6 +48,7 @@ class SendResult
 		$this.Module = $module
 	}
 	
+	#Methods
 	WriteIfError()
 	{
 		if (-not $this.Success)
@@ -56,11 +57,16 @@ class SendResult
 		}
 		else
 		{
-			$this.WriteStatus()
+			$this.WriteStatusNoNewLine()
+			foreach ($item in $this.Result) {
+				Write-Host -NoNewLine ' - '
+				$this.WriteAction($item)
+			}
+			Write-Host ''
 		}
 	}
 	
-	WriteStatus()
+	WriteStatusNoNewLine()
 	{
 		Write-Host -NoNewline "$($this.Module)" -ForegroundColor Cyan
 		Write-Host -NoNewline ' -'
@@ -68,43 +74,54 @@ class SendResult
 		Write-Host -NoNewline ' returned '
 		if ($this.Success)
 		{
-			Write-Host ' Success' -ForegroundColor Green
+			Write-Host -NoNewline ' Success' -ForegroundColor Green
 		}
 		else
 		{
-			Write-Host ' Failure' -ForegroundColor Red
+			Write-Host -NoNewline ' Failure' -ForegroundColor Red
 		}
 	}
+
+	WriteStatus()
+	{
+		$this.WriteStatusNoNewLine()
+		Write-Host ''
+	}	
 	
-	#Methods
+	WriteAction($item)
+	{
+		switch ($item.action) {
+			'Created' {
+				Write-Host -NoNewline -ForegroundColor Green $item.action
+			}
+			'Updated' {
+				Write-Host -NoNewline -ForegroundColor DarkGreen $item.action
+			}
+			'Skipped' {
+				Write-Host -NoNewline -ForegroundColor Yellow $item.action
+			}
+			'None' {
+				Write-Host -NoNewline -ForegroundColor Red $item.action
+			}
+			default {
+				Write-Host -NoNewline -ForegroundColor Cyan $item.action
+			}
+		}
+	}
+
 	WriteOutWithActionHightlight()
 	{
 		$this.WriteStatus()
 		foreach ($item in $this.Result)
-		{
+		{			
 			if ($item -is [string])
 			{
 				Write-Host "`t$item"
 			}
 			elseif ($this.Success)
 			{
-				switch ($item.action) {
-					'Created' {
-						Write-Host -NoNewline -ForegroundColor Green $item.action
-					}
-					'Updated' {
-						Write-Host -NoNewline -ForegroundColor DarkGreen $item.action
-					}
-					'Skipped' {
-						Write-Host -NoNewline -ForegroundColor Yellow $item.action
-					}
-					'None' {
-						Write-Host -NoNewline -ForegroundColor Red $item.action
-					}
-					default {
-						Write-Host -NoNewline -ForegroundColor Cyan $item.action
-					}
-				}				
+				$this.WriteAction($item)
+								
 				Write-Host "`t$(ConvertTo-Json -InputObject $item -Depth 10 -Compress)"
 			}
 			else
