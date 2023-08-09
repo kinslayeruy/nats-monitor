@@ -9,7 +9,7 @@ namespace NATSMonitor
 {
     internal class Program
     {
-        private static string URL = "nats://nats.service.owf-dev:4222";
+        private static string URL = "********setyourNATSurlhere";
         private static string _eventName;
         private static int _eventCount;
 
